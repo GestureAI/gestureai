@@ -1,1 +1,108 @@
-@import 'tailwindcss';
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+	:root {
+		--background: 80 23.08% 97.45%;
+		--foreground: 63.16 13.67% 27.25%;
+		--card: 0 0% 100%;
+		--card-foreground: 63.16 13.67% 27.25%;
+		--popover: 0 0% 100%;
+		--popover-foreground: 63.16 13.67% 27.25%;
+		--primary: 80.4 22.94% 57.25%;
+		--primary-foreground: 80 23.08% 97.45%;
+		--secondary: 78.95 33.33% 88.82%;
+		--secondary-foreground: 63.16 13.67% 27.25%;
+		--muted: 78 15.15% 87.06%;
+		--muted-foreground: 67.5 10.34% 45.49%;
+		--accent: 78.95 33.33% 88.82%;
+		--accent-foreground: 163.45 23.97% 23.73%;
+		--destructive: 0 100% 40.98%;
+		--destructive-foreground: 80 23.08% 97.45%;
+		--border: 78.75 17.39% 81.96%;
+		--input: 80 23.08% 92.35%;
+		--ring: 80.4 22.94% 57.25%;
+		--chart-1: 80.4 22.94% 57.25%;
+		--chart-2: 162.46 56.52% 77.45%;
+		--chart-3: 338.77 31.4% 59.41%;
+		--chart-4: 215.76 76.74% 74.71%;
+		--chart-5: 35.82 54.47% 75.88%;
+		--sidebar: 80 23.08% 94.9%;
+		--sidebar-foreground: 63.16 13.67% 27.25%;
+		--sidebar-primary: 80.4 22.94% 57.25%;
+		--sidebar-primary-foreground: 80 23.08% 97.45%;
+		--sidebar-accent: 162.46 56.52% 77.45%;
+		--sidebar-accent-foreground: 163.45 23.97% 23.73%;
+		--sidebar-border: 81.43 18.42% 85.1%;
+		--sidebar-ring: 80.4 22.94% 57.25%;
+		--font-sans: Geist, sans-serif;
+		--font-serif: 'Lora', Georgia, serif;
+		--font-mono: 'Fira Code', 'Courier New', monospace;
+		--radius: 0.5rem;
+		--shadow-2xs: 1px 2px 5px 1px hsl(0 0% 10.2% / 0.03);
+		--shadow-xs: 1px 2px 5px 1px hsl(0 0% 10.2% / 0.03);
+		--shadow-sm: 1px 2px 5px 1px hsl(0 0% 10.2% / 0.06), 1px 1px 2px 0px hsl(0 0% 10.2% / 0.06);
+		--shadow: 1px 2px 5px 1px hsl(0 0% 10.2% / 0.06), 1px 1px 2px 0px hsl(0 0% 10.2% / 0.06);
+		--shadow-md: 1px 2px 5px 1px hsl(0 0% 10.2% / 0.06), 1px 2px 4px 0px hsl(0 0% 10.2% / 0.06);
+		--shadow-lg: 1px 2px 5px 1px hsl(0 0% 10.2% / 0.06), 1px 4px 6px 0px hsl(0 0% 10.2% / 0.06);
+		--shadow-xl: 1px 2px 5px 1px hsl(0 0% 10.2% / 0.06), 1px 8px 10px 0px hsl(0 0% 10.2% / 0.06);
+		--shadow-2xl: 1px 2px 5px 1px hsl(0 0% 10.2% / 0.15);
+	}
+
+	.dark {
+		--background: 70.91 18.64% 11.57%;
+		--foreground: 70 36% 90.2%;
+		--card: 71.25 20% 15.69%;
+		--card-foreground: 70 36% 90.2%;
+		--popover: 71.25 20% 15.69%;
+		--popover-foreground: 70 36% 90.2%;
+		--primary: 83.08 32.5% 68.63%;
+		--primary-foreground: 70.91 18.64% 11.57%;
+		--secondary: 74.48 14.87% 38.24%;
+		--secondary-foreground: 70 36% 90.2%;
+		--muted: 74.12 20.99% 15.88%;
+		--muted-foreground: 78.95 10.38% 64.12%;
+		--accent: 91.76 15.6% 21.37%;
+		--accent-foreground: 165.52 69.05% 83.53%;
+		--destructive: 180 68.67% 67.45%;
+		--destructive-foreground: 70.91 18.64% 11.57%;
+		--border: 72 18.52% 21.18%;
+		--input: 69.47 19.59% 19.02%;
+		--ring: 83.08 32.5% 68.63%;
+		--chart-1: 83.08 32.5% 68.63%;
+		--chart-2: 165.52 69.05% 83.53%;
+		--chart-3: 338.77 31.4% 59.41%;
+		--chart-4: 215.76 76.74% 74.71%;
+		--chart-5: 35.82 54.47% 75.88%;
+		--sidebar: 70.91 21.57% 10%;
+		--sidebar-foreground: 70 36% 90.2%;
+		--sidebar-primary: 83.08 32.5% 68.63%;
+		--sidebar-primary-foreground: 70.91 18.64% 11.57%;
+		--sidebar-accent: 91.76 15.6% 21.37%;
+		--sidebar-accent-foreground: 165.52 69.05% 83.53%;
+		--sidebar-border: 69.47 19.59% 19.02%;
+		--sidebar-ring: 83.08 32.5% 68.63%;
+		--font-sans: Geist, sans-serif;
+		--font-serif: 'Lora', Georgia, serif;
+		--font-mono: 'Fira Code', 'Courier New', monospace;
+		--radius: 0.5rem;
+		--shadow-2xs: 1px 2px 5px 1px hsl(0 0% 10.2% / 0.03);
+		--shadow-xs: 1px 2px 5px 1px hsl(0 0% 10.2% / 0.03);
+		--shadow-sm: 1px 2px 5px 1px hsl(0 0% 10.2% / 0.06), 1px 1px 2px 0px hsl(0 0% 10.2% / 0.06);
+		--shadow: 1px 2px 5px 1px hsl(0 0% 10.2% / 0.06), 1px 1px 2px 0px hsl(0 0% 10.2% / 0.06);
+		--shadow-md: 1px 2px 5px 1px hsl(0 0% 10.2% / 0.06), 1px 2px 4px 0px hsl(0 0% 10.2% / 0.06);
+		--shadow-lg: 1px 2px 5px 1px hsl(0 0% 10.2% / 0.06), 1px 4px 6px 0px hsl(0 0% 10.2% / 0.06);
+		--shadow-xl: 1px 2px 5px 1px hsl(0 0% 10.2% / 0.06), 1px 8px 10px 0px hsl(0 0% 10.2% / 0.06);
+		--shadow-2xl: 1px 2px 5px 1px hsl(0 0% 10.2% / 0.15);
+	}
+}
+
+@layer base {
+	* {
+		@apply border-border;
+	}
+	body {
+		@apply bg-background text-foreground;
+	}
+}
