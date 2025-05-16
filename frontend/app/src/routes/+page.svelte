@@ -1,4 +1,8 @@
 <script lang="ts">
+	import * as Breadcrumb from '$lib/components/ui/breadcrumb/index.js';
+	import { Separator } from '$lib/components/ui/separator/index.js';
+	import * as Sidebar from '$lib/components/ui/sidebar/index.js';
+
 	// For WS communication and ui state
 	interface ChatMessageFromServer {
 		id: string; // Server generated ID.
@@ -213,29 +217,49 @@
 	});
 </script>
 
-<h1>Global Chat</h1>
+<header class="flex h-16 shrink-0 items-center gap-2">
+	<div class="flex items-center gap-2 px-4">
+		<Sidebar.Trigger class="-ml-1" />
+		<Separator orientation="vertical" class="mr-2 h-4" />
+		<Breadcrumb.Root>
+			<Breadcrumb.List>
+				<Breadcrumb.Item class="hidden md:block">
+					<Breadcrumb.Link href="/">GestureAI</Breadcrumb.Link>
+				</Breadcrumb.Item>
+				<Breadcrumb.Separator class="hidden md:block" />
+				<Breadcrumb.Item>
+					<Breadcrumb.Page>Global Chat</Breadcrumb.Page>
+				</Breadcrumb.Item>
+			</Breadcrumb.List>
+		</Breadcrumb.Root>
+	</div>
+</header>
 
-<div>Status: {isConnected ? 'Connected' : 'Disconnected'}</div>
-{#if currentUser}
-	<div>Username: {currentUser.username}</div>
-{/if}
+<div class="flex flex-col p-4">
+	<h1>Global Chat</h1>
+	<div>Status: {isConnected ? 'Connected' : 'Disconnected'}</div>
+	{#if currentUser}
+		<div>Username: {currentUser.username}</div>
+	{/if}
 
-<div class="mb-3 h-64 overflow-y-auto border p-10">
-	{#each messages as message (message.id)}
-		<div>
-			<b>{message.username}</b> ({formatTime(message.timestamp)}): {message.message}
-		</div>
-	{/each}
-</div>
+	<div class="mb-3 h-64 overflow-y-auto rounded border p-10">
+		{#each messages as message (message.id)}
+			<div>
+				<b>{message.username}</b> ({formatTime(message.timestamp)}): {message.message}
+			</div>
+		{/each}
+	</div>
 
-<div>
-	<input
-		type="text"
-		bind:value={messageInput}
-		placeholder="Type a message..."
-		onkeydown={handleKeydown}
-		disabled={!isConnected}
-	/>
-	<button onclick={sendMessageInternal} disabled={!isConnected || !messageInput.trim()}>Send</button
-	>
+	<div>
+		<input
+			type="text"
+			bind:value={messageInput}
+			placeholder="Type a message..."
+			onkeydown={handleKeydown}
+			disabled={!isConnected}
+		/>
+		<button onclick={sendMessageInternal} disabled={!isConnected || !messageInput.trim()}
+			>Send</button
+		>
+	</div>
 </div>
