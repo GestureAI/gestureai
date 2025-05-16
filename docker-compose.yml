@@ -1,0 +1,25 @@
+services:
+  backend:
+    container_name: backend
+    restart: unless-stopped
+    build: ./backend
+    ports:
+      - "5001:3000"
+    environment:
+      - PYTHONUNBUFFERED=1
+      - UV_LINK_MODE=copy
+
+  frontend:
+    container_name: frontend
+    restart: unless-stopped
+    build: ./frontend
+    ports:
+      - "5000:3000"
+
+  redis:
+    image: redis:8-alpine
+    container_name: redis
+    restart: unless-stopped
+    command: redis-server --loglevel warning --requirepass $REDIS_PASS # Save every 60 seconds if at least 1 key changed. Save to /data
+    ports:
+      - "6379:6379"
