@@ -1,0 +1,17 @@
+services:
+  backend:
+    container_name: backend
+    restart: unless-stopped
+    build: ./backend
+    ports:
+      - "5001:3000"
+    environment:
+      - PYTHONUNBUFFERED=1
+      - UV_LINK_MODE=copy
+
+  frontend:
+    container_name: frontend
+    restart: unless-stopped
+    build: ./frontend
+    ports:
+      - "5000:3000"
