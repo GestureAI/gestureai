@@ -1,10 +1,12 @@
 <script lang="ts">
-	import { BadgeCheck, ChevronsUpDown, LogOut } from '@lucide/svelte';
+	import { User, ChevronsUpDown, LogOut, Sun, Moon } from '@lucide/svelte';
 
 	import * as Avatar from '$lib/components/ui/avatar/index.js';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu/index.js';
 	import * as Sidebar from '$lib/components/ui/sidebar/index.js';
 	import { useSidebar } from '$lib/components/ui/sidebar/index.js';
+
+	import { toggleMode } from 'mode-watcher';
 
 	let {
 		user
@@ -53,15 +55,19 @@
 						</Avatar.Root>
 						<div class="grid flex-1 text-left text-sm leading-tight">
 							<span class="truncate font-semibold">{user.name}</span>
-							<span class="truncate text-xs">{user.email}</span>
 						</div>
 					</div>
 				</DropdownMenu.Label>
 				<DropdownMenu.Separator />
 				<DropdownMenu.Group>
 					<DropdownMenu.Item>
-						<BadgeCheck />
+						<User />
 						Account
+					</DropdownMenu.Item>
+					<DropdownMenu.Item onclick={() => toggleMode()}>
+						<Sun class="rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+						<Moon class="absolute rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+						Toggle theme
 					</DropdownMenu.Item>
 				</DropdownMenu.Group>
 				<DropdownMenu.Separator />

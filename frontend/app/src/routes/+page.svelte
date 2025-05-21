@@ -2,6 +2,7 @@
 	import * as Breadcrumb from '$lib/components/ui/breadcrumb/index.js';
 	import { Separator } from '$lib/components/ui/separator/index.js';
 	import * as Sidebar from '$lib/components/ui/sidebar/index.js';
+	import { Button } from '$lib/components/ui/button/index.js';
 
 	// For WS communication and ui state
 	interface ChatMessageFromServer {
@@ -235,14 +236,14 @@
 	</div>
 </header>
 
-<div class="flex flex-col p-4">
-	<h1>Global Chat</h1>
+<div class="flex flex-grow flex-col p-4">
+	<!-- <h1>Global Chat</h1>
 	<div>Status: {isConnected ? 'Connected' : 'Disconnected'}</div>
 	{#if currentUser}
 		<div>Username: {currentUser.username}</div>
-	{/if}
+	{/if} -->
 
-	<div class="mb-3 h-64 overflow-y-auto rounded border p-10">
+	<div class="mb-3 flex size-full flex-col overflow-y-auto rounded">
 		{#each messages as message (message.id)}
 			<div>
 				<b>{message.username}</b> ({formatTime(message.timestamp)}): {message.message}
@@ -250,16 +251,14 @@
 		{/each}
 	</div>
 
-	<div>
+	<div class="flex w-full justify-center">
 		<input
 			type="text"
 			bind:value={messageInput}
 			placeholder="Type a message..."
 			onkeydown={handleKeydown}
-			disabled={!isConnected}
+			class="w-96 rounded-lg border p-2"
 		/>
-		<button onclick={sendMessageInternal} disabled={!isConnected || !messageInput.trim()}
-			>Send</button
-		>
+		<Button class="ml-4" onclick={sendMessageInternal} disabled={!messageInput.trim()}>Send</Button>
 	</div>
 </div>

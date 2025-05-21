@@ -1,16 +1,16 @@
 <script lang="ts" module>
-	import { LifeBuoy, Send, SquareTerminal } from '@lucide/svelte';
+	import { LifeBuoy, Send, MessageSquare } from '@lucide/svelte';
 
 	const data = {
 		user: {
 			name: 'shadcn',
-			avatar: '/avatars/shadcn.jpg'
+			avatar: ''
 		},
 		navMain: [
 			{
 				title: 'Public',
 				url: '#',
-				icon: SquareTerminal,
+				icon: MessageSquare,
 				isActive: true,
 				items: [
 					{
@@ -24,13 +24,17 @@
 					{
 						title: "User525's Chat",
 						url: '#'
+					},
+					{
+						title: "User526's Chat",
+						url: '#'
 					}
 				]
 			},
 			{
 				title: 'Private',
 				url: '#',
-				icon: SquareTerminal,
+				icon: MessageSquare,
 				isActive: true,
 				items: [
 					{
@@ -43,6 +47,10 @@
 					},
 					{
 						title: 'Group Chat 3',
+						url: '#'
+					},
+					{
+						title: 'Group Chat 4',
 						url: '#'
 					}
 				]

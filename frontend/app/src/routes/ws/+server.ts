@@ -2,7 +2,7 @@ import type { Socket, Peer } from '@sveltejs/kit';
 import { RedisChatService, type ChatMessage } from '$lib/server/redis-chat';
 
 function generateUsername(): string {
-	return `User${Math.floor(Math.random() * 900) + 100}`;
+	return `Guest${Math.floor(Math.random() * 900)}`;
 }
 
 // Tracks active WebSocket peers
