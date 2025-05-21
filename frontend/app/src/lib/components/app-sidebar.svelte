@@ -1,102 +1,48 @@
 <script lang="ts" module>
-	import BookOpen from '@lucide/svelte/icons/book-open';
-	import Bot from '@lucide/svelte/icons/bot';
-	import ChartPie from '@lucide/svelte/icons/chart-pie';
-	import Frame from '@lucide/svelte/icons/frame';
-	import LifeBuoy from '@lucide/svelte/icons/life-buoy';
-	import Map from '@lucide/svelte/icons/map';
-	import Send from '@lucide/svelte/icons/send';
-	import Settings2 from '@lucide/svelte/icons/settings-2';
-	import SquareTerminal from '@lucide/svelte/icons/square-terminal';
+	import { LifeBuoy, Send, SquareTerminal } from '@lucide/svelte';
 
 	const data = {
 		user: {
 			name: 'shadcn',
-			email: 'm@example.com',
 			avatar: '/avatars/shadcn.jpg'
 		},
 		navMain: [
 			{
-				title: 'Playground',
+				title: 'Public',
 				url: '#',
 				icon: SquareTerminal,
 				isActive: true,
 				items: [
 					{
-						title: 'History',
+						title: 'Global Chat',
 						url: '#'
 					},
 					{
-						title: 'Starred',
+						title: 'Temporary Chat',
 						url: '#'
 					},
 					{
-						title: 'Settings',
+						title: "User525's Chat",
 						url: '#'
 					}
 				]
 			},
 			{
-				title: 'Models',
+				title: 'Private',
 				url: '#',
-				icon: Bot,
+				icon: SquareTerminal,
+				isActive: true,
 				items: [
 					{
-						title: 'Genesis',
+						title: 'Group Chat 1',
 						url: '#'
 					},
 					{
-						title: 'Explorer',
+						title: 'Group Chat 2',
 						url: '#'
 					},
 					{
-						title: 'Quantum',
-						url: '#'
-					}
-				]
-			},
-			{
-				title: 'Documentation',
-				url: '#',
-				icon: BookOpen,
-				items: [
-					{
-						title: 'Introduction',
-						url: '#'
-					},
-					{
-						title: 'Get Started',
-						url: '#'
-					},
-					{
-						title: 'Tutorials',
-						url: '#'
-					},
-					{
-						title: 'Changelog',
-						url: '#'
-					}
-				]
-			},
-			{
-				title: 'Settings',
-				url: '#',
-				icon: Settings2,
-				items: [
-					{
-						title: 'General',
-						url: '#'
-					},
-					{
-						title: 'Team',
-						url: '#'
-					},
-					{
-						title: 'Billing',
-						url: '#'
-					},
-					{
-						title: 'Limits',
+						title: 'Group Chat 3',
 						url: '#'
 					}
 				]
@@ -113,30 +59,12 @@
 				url: '#',
 				icon: Send
 			}
-		],
-		projects: [
-			{
-				name: 'Design Engineering',
-				url: '#',
-				icon: Frame
-			},
-			{
-				name: 'Sales & Marketing',
-				url: '#',
-				icon: ChartPie
-			},
-			{
-				name: 'Travel',
-				url: '#',
-				icon: Map
-			}
 		]
 	};
 </script>
 
 <script lang="ts">
 	import NavMain from '$lib/components/nav-main.svelte';
-	import NavProjects from '$lib/components/nav-projects.svelte';
 	import NavSecondary from '$lib/components/nav-secondary.svelte';
 	import NavUser from '$lib/components/nav-user.svelte';
 	import * as Sidebar from '$lib/components/ui/sidebar/index.js';
@@ -170,7 +98,6 @@
 	</Sidebar.Header>
 	<Sidebar.Content>
 		<NavMain items={data.navMain} />
-		<NavProjects projects={data.projects} />
 		<NavSecondary items={data.navSecondary} class="mt-auto" />
 	</Sidebar.Content>
 	<Sidebar.Footer>
