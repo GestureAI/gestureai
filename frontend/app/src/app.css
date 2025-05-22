@@ -93,6 +93,10 @@
 }
 
 @layer base {
+	:root {
+		overscroll-behavior: none;
+		overflow-x: hidden;
+	}
 	* {
 		@apply border-border;
 	}

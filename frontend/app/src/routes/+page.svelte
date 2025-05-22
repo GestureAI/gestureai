@@ -10,13 +10,10 @@
 	import { Separator } from '$lib/components/ui/separator/index.js';
 	import * as Sidebar from '$lib/components/ui/sidebar/index.js';
 	import { Button } from '$lib/components/ui/button/index.js';
-	import { Textarea } from '$lib/components/ui/textarea/index.js';
 	import { Badge } from '$lib/components/ui/badge/index.js';
-
 	import { usernameStore } from '$lib/stores';
-
 	import { UseAutoScroll } from '$lib/hooks/use-auto-scroll.svelte';
-
+	import { Paperclip, ArrowUp, Hand } from '@lucide/svelte';
 	const autoScroll = new UseAutoScroll();
 
 	// For WS communication and ui state
@@ -206,13 +203,6 @@
 		messageInput = '';
 	}
 
-	function handleKeydown(e: KeyboardEvent): void {
-		if (e.key === 'Enter') {
-			e.preventDefault();
-			sendMessageInternal();
-		}
-	}
-
 	// Connect to WS on mount, disconnect on unmount
 	$effect(() => {
 		console.log('[Client $effect] Mount: Initializing connection sequence.');
@@ -246,7 +236,7 @@
 	});
 </script>
 
-<main class="flex h-screen max-h-screen flex-col overflow-hidden">
+<div class="flex h-screen max-h-screen flex-col overflow-hidden">
 	<!-- Header with sidebar logic and breadcrumb component -->
 	<header class="flex h-16 shrink-0 items-center justify-between gap-2">
 		<div class="flex items-center gap-2 px-4">
@@ -283,11 +273,12 @@
 		</div>
 	</header>
 
-	<div class="flex flex-1 flex-col overflow-hidden px-2 lg:px-20">
-		<h1 class="mb-4 shrink-0 text-3xl font-medium tracking-tight">Global Chat</h1>
-
+	<div class="flex flex-1 flex-col overflow-hidden px-2 sm:px-0">
 		<!-- Chat area -->
-		<div class="flex flex-1 flex-col gap-y-4 overflow-y-auto rounded" bind:this={autoScroll.ref}>
+		<div
+			class="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-y-4 overflow-y-auto rounded"
+			bind:this={autoScroll.ref}
+		>
 			{#each messages as message (message.id)}
 				<div class="flex w-full {message.username === currentUser?.username ? 'justify-end' : ''}">
 					<div class="flex flex-col">
@@ -303,17 +294,80 @@
 		</div>
 
 		<!-- Input area -->
-		<div class="mt-4 flex w-full shrink-0 items-center justify-center pb-4">
-			<Textarea
-				bind:value={messageInput}
-				placeholder="Write a message..."
-				onkeydown={handleKeydown}
-				class="min-h-[none] w-full [resize:none] lg:w-1/2"
-				rows={2}
-			/>
-			<Button class="ml-4" onclick={sendMessageInternal} disabled={!messageInput.trim()}>
-				Send
-			</Button>
+		<div class="mx-auto mt-4 flex w-full max-w-3xl shrink-0 items-center">
+			<div class="w-full rounded-t backdrop-blur-lg">
+				<form
+					onsubmit={(event) => {
+						event.preventDefault();
+						sendMessageInternal();
+					}}
+					class="chat-shadow relative flex w-full flex-col gap-2 rounded-t-xl border border-b-0 border-primary/70 px-3 py-3 text-secondary-foreground max-sm:pb-6"
+				>
+					<textarea
+						bind:value={messageInput}
+						placeholder="Type your message here..."
+						class="w-full resize-none bg-transparent text-base leading-6 text-foreground outline-none placeholder:text-secondary-foreground/60"
+						aria-label="Message input"
+						autocomplete="off"
+						style="height: 48px !important;"
+						onkeydown={(e) => {
+							if (e.key === 'Enter' && !e.shiftKey) {
+								e.preventDefault();
+								if (messageInput.trim()) {
+									sendMessageInternal();
+								}
+							}
+						}}
+					>
+					</textarea>
+
+					<!-- Action buttons -->
+					<div class="flex items-center justify-between">
+						<div class="flex items-center gap-x-2">
+							<!-- Open modal for  AI sign language recognition -->
+							<button
+								class="inline-flex h-auto items-center gap-2 rounded-full border border-secondary-foreground/10 px-2 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted/40 hover:text-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 max-sm:p-2"
+							>
+								<Hand class="size-4 shrink-0" />
+								<span class="max-sm:hidden">Gesture AI</span>
+							</button>
+
+							<!-- Attach media button -->
+							<label
+								class="inline-flex h-auto cursor-pointer items-center gap-2 rounded-full border border-secondary-foreground/10 px-2 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted/40 hover:text-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 max-sm:p-2"
+								aria-label="Attach a file"
+							>
+								<input class="sr-only" type="file" />
+								<Paperclip class="size-4 shrink-0" />
+								<span class="max-sm:hidden">Attach</span>
+							</label>
+						</div>
+
+						<!-- Send text button -->
+						<Button
+							onclick={sendMessageInternal}
+							size="icon"
+							type="submit"
+							aria-label="Message requires text"
+							disabled={!messageInput.trim()}
+						>
+							<ArrowUp />
+						</Button>
+					</div>
+				</form>
+			</div>
 		</div>
 	</div>
-</main>
+</div>
+
+<style>
+	.chat-shadow {
+		box-shadow:
+			rgba(0, 0, 0, 0.1) 0px 80px 50px 0px,
+			rgba(0, 0, 0, 0.07) 0px 50px 30px 0px,
+			rgba(0, 0, 0, 0.06) 0px 30px 15px 0px,
+			rgba(0, 0, 0, 0.04) 0px 15px 8px,
+			rgba(0, 0, 0, 0.04) 0px 6px 4px,
+			rgba(0, 0, 0, 0.02) 0px 2px 2px;
+	}
+</style>
