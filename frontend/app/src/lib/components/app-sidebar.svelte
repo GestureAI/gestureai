@@ -1,9 +1,10 @@
 <script lang="ts" module>
 	import { LifeBuoy, Send, MessageSquare } from '@lucide/svelte';
+	import { usernameStore } from '$lib/stores';
 
-	const data = {
+	let data = $state({
 		user: {
-			name: 'shadcn',
+			name: '',
 			avatar: ''
 		},
 		navMain: [
@@ -68,7 +69,7 @@
 				icon: Send
 			}
 		]
-	};
+	});
 </script>
 
 <script lang="ts">
@@ -80,6 +81,12 @@
 	import type { ComponentProps } from 'svelte';
 
 	let { ref = $bindable(null), ...restProps }: ComponentProps<typeof Sidebar.Root> = $props();
+
+	$effect(() => {
+		if ($usernameStore) {
+			data.user.name = $usernameStore;
+		}
+	});
 </script>
 
 <Sidebar.Root bind:ref variant="inset" {...restProps}>
@@ -95,8 +102,7 @@
 								<Command class="size-4" />
 							</div>
 							<div class="grid flex-1 text-left text-sm leading-tight">
-								<span class="truncate font-semibold">GestureAI</span>
-								<span class="truncate text-xs">Enterprise</span>
+								<span class="truncate text-2xl font-semibold">GestureAI</span>
 							</div>
 						</a>
 					{/snippet}

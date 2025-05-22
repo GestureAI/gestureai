@@ -13,7 +13,11 @@
 	import { Textarea } from '$lib/components/ui/textarea/index.js';
 	import { Badge } from '$lib/components/ui/badge/index.js';
 
-	// import { Home } from '@lucide/svelte';
+	import { usernameStore } from '$lib/stores';
+
+	import { UseAutoScroll } from '$lib/hooks/use-auto-scroll.svelte';
+
+	const autoScroll = new UseAutoScroll();
 
 	// For WS communication and ui state
 	interface ChatMessageFromServer {
@@ -233,70 +237,83 @@
 			}
 		};
 	});
+
+	// Set username store value so it can be used in sidebar component
+	$effect(() => {
+		if (currentUser?.username) {
+			usernameStore.set(currentUser.username);
+		}
+	});
 </script>
 
-<header class="flex h-16 shrink-0 items-center justify-between gap-2">
-	<div class="flex items-center gap-2 px-4">
-		<Sidebar.Trigger class="-ml-1" />
-		<Separator orientation="vertical" class="mr-2 h-4" />
+<main class="flex h-screen max-h-screen flex-col overflow-hidden">
+	<!-- Header with sidebar logic and breadcrumb component -->
+	<header class="flex h-16 shrink-0 items-center justify-between gap-2">
+		<div class="flex items-center gap-2 px-4">
+			<Sidebar.Trigger class="-ml-1" />
+			<Separator orientation="vertical" class="mr-2 h-4" />
 
-		<Breadcrumb>
-			<BreadcrumbList
-				class="rounded-lg border border-border bg-background px-3 py-2 shadow-sm shadow-black/5"
-			>
-				<BreadcrumbItem>
-					<BreadcrumbLink href="#title">GestureAI</BreadcrumbLink>
-				</BreadcrumbItem>
-				<BreadcrumbSeparator />
-				<BreadcrumbItem>
-					<BreadcrumbPage>Global Chat</BreadcrumbPage>
-				</BreadcrumbItem>
-			</BreadcrumbList>
-		</Breadcrumb>
-	</div>
-
-	<div class="mr-4">
-		<Badge
-			variant="outline"
-			class="gap-1.5 rounded-lg border border-border bg-background px-3 py-2 shadow-sm shadow-black/5"
-		>
-			<span
-				class="size-2 rounded-full {isConnected ? 'bg-emerald-500' : 'bg-red-500'}"
-				aria-hidden="true"
-			></span>
-			{isConnected ? 'Connected' : 'Disconnected'}
-		</Badge>
-	</div>
-</header>
-
-<div class="flex flex-col px-2 py-4 lg:px-20">
-	<h1 class="text-3xl font-medium tracking-tight">Global Chat</h1>
-
-	<!-- {#if currentUser}
-		<div>Username: {currentUser.username}</div>
-	{/if} -->
-
-	<div class="my-3 flex max-h-screen flex-col gap-y-4 overflow-y-auto rounded">
-		{#each messages as message (message.id)}
-			<div class="flex flex-col">
-				<b
-					>{message.username}<span class=" ml-2 text-xs text-muted-foreground"
-						>{formatTime(message.timestamp)}</span
-					></b
+			<Breadcrumb class="hidden sm:block">
+				<BreadcrumbList
+					class="rounded-lg border border-border bg-background px-3 py-2 shadow-sm shadow-black/5"
 				>
-				{message.message}
-			</div>
-		{/each}
-	</div>
+					<BreadcrumbItem>
+						<BreadcrumbLink href="/">GestureAI</BreadcrumbLink>
+					</BreadcrumbItem>
+					<BreadcrumbSeparator />
+					<BreadcrumbItem>
+						<BreadcrumbPage>Global Chat</BreadcrumbPage>
+					</BreadcrumbItem>
+				</BreadcrumbList>
+			</Breadcrumb>
+		</div>
 
-	<div class="flex w-full items-center justify-center">
-		<Textarea
-			bind:value={messageInput}
-			placeholder="Write a message..."
-			onkeydown={handleKeydown}
-			class="min-h-[none] w-full [resize:none] lg:w-1/2"
-			rows={2}
-		/>
-		<Button class="ml-4" onclick={sendMessageInternal} disabled={!messageInput.trim()}>Send</Button>
+		<!-- Show if user is connected to websocket -->
+		<div class="mr-4">
+			<Badge
+				variant="outline"
+				class="gap-1.5 rounded-lg border border-border bg-background px-3 py-2 shadow-sm shadow-black/5"
+			>
+				<span
+					class="size-2 rounded-full {isConnected ? 'bg-emerald-500' : 'bg-red-500'}"
+					aria-hidden="true"
+				></span>
+				{isConnected ? 'Connected' : 'Disconnected'}
+			</Badge>
+		</div>
+	</header>
+
+	<div class="flex flex-1 flex-col overflow-hidden px-2 lg:px-20">
+		<h1 class="mb-4 shrink-0 text-3xl font-medium tracking-tight">Global Chat</h1>
+
+		<!-- Chat area -->
+		<div class="flex flex-1 flex-col gap-y-4 overflow-y-auto rounded" bind:this={autoScroll.ref}>
+			{#each messages as message (message.id)}
+				<div class="flex w-full {message.username === currentUser?.username ? 'justify-end' : ''}">
+					<div class="flex flex-col">
+						<b>
+							{message.username}<span class="ml-2 text-xs text-muted-foreground">
+								{formatTime(message.timestamp)}
+							</span>
+						</b>
+						{message.message}
+					</div>
+				</div>
+			{/each}
+		</div>
+
+		<!-- Input area -->
+		<div class="mt-4 flex w-full shrink-0 items-center justify-center pb-4">
+			<Textarea
+				bind:value={messageInput}
+				placeholder="Write a message..."
+				onkeydown={handleKeydown}
+				class="min-h-[none] w-full [resize:none] lg:w-1/2"
+				rows={2}
+			/>
+			<Button class="ml-4" onclick={sendMessageInternal} disabled={!messageInput.trim()}>
+				Send
+			</Button>
+		</div>
 	</div>
-</div>
+</main>
