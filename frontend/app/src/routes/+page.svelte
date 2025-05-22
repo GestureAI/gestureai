@@ -1,4 +1,24 @@
 <script lang="ts">
+	import {
+		Breadcrumb,
+		BreadcrumbItem,
+		BreadcrumbLink,
+		BreadcrumbList,
+		BreadcrumbPage,
+		BreadcrumbSeparator
+	} from '$lib/components/ui/breadcrumb';
+	import { Separator } from '$lib/components/ui/separator/index.js';
+	import * as Sidebar from '$lib/components/ui/sidebar/index.js';
+	import { Button } from '$lib/components/ui/button/index.js';
+	import { Textarea } from '$lib/components/ui/textarea/index.js';
+	import { Badge } from '$lib/components/ui/badge/index.js';
+
+	import { usernameStore } from '$lib/stores';
+
+	import { UseAutoScroll } from '$lib/hooks/use-auto-scroll.svelte';
+
+	const autoScroll = new UseAutoScroll();
+
 	// For WS communication and ui state
 	interface ChatMessageFromServer {
 		id: string; // Server generated ID.
@@ -49,7 +69,13 @@
 	let isIntentionallyClosing = false;
 
 	function formatTime(timestamp: number): string {
-		return new Date(timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+		return new Date(timestamp).toLocaleTimeString([], {
+			day: '2-digit',
+			month: '2-digit',
+			year: 'numeric',
+			hour: '2-digit',
+			minute: '2-digit'
+		});
 	}
 
 	// Core WS connection and reconnection logic
@@ -211,31 +237,83 @@
 			}
 		};
 	});
+
+	// Set username store value so it can be used in sidebar component
+	$effect(() => {
+		if (currentUser?.username) {
+			usernameStore.set(currentUser.username);
+		}
+	});
 </script>
 
-<h1>Global Chat</h1>
+<main class="flex h-screen max-h-screen flex-col overflow-hidden">
+	<!-- Header with sidebar logic and breadcrumb component -->
+	<header class="flex h-16 shrink-0 items-center justify-between gap-2">
+		<div class="flex items-center gap-2 px-4">
+			<Sidebar.Trigger class="-ml-1" />
+			<Separator orientation="vertical" class="mr-2 h-4" />
 
-<div>Status: {isConnected ? 'Connected' : 'Disconnected'}</div>
-{#if currentUser}
-	<div>Username: {currentUser.username}</div>
-{/if}
-
-<div class="mb-3 h-64 overflow-y-auto border p-10">
-	{#each messages as message (message.id)}
-		<div>
-			<b>{message.username}</b> ({formatTime(message.timestamp)}): {message.message}
+			<Breadcrumb class="hidden sm:block">
+				<BreadcrumbList
+					class="rounded-lg border border-border bg-background px-3 py-2 shadow-sm shadow-black/5"
+				>
+					<BreadcrumbItem>
+						<BreadcrumbLink href="/">GestureAI</BreadcrumbLink>
+					</BreadcrumbItem>
+					<BreadcrumbSeparator />
+					<BreadcrumbItem>
+						<BreadcrumbPage>Global Chat</BreadcrumbPage>
+					</BreadcrumbItem>
+				</BreadcrumbList>
+			</Breadcrumb>
 		</div>
-	{/each}
-</div>
 
-<div>
-	<input
-		type="text"
-		bind:value={messageInput}
-		placeholder="Type a message..."
-		onkeydown={handleKeydown}
-		disabled={!isConnected}
-	/>
-	<button onclick={sendMessageInternal} disabled={!isConnected || !messageInput.trim()}>Send</button
-	>
-</div>
+		<!-- Show if user is connected to websocket -->
+		<div class="mr-4">
+			<Badge
+				variant="outline"
+				class="gap-1.5 rounded-lg border border-border bg-background px-3 py-2 shadow-sm shadow-black/5"
+			>
+				<span
+					class="size-2 rounded-full {isConnected ? 'bg-emerald-500' : 'bg-red-500'}"
+					aria-hidden="true"
+				></span>
+				{isConnected ? 'Connected' : 'Disconnected'}
+			</Badge>
+		</div>
+	</header>
+
+	<div class="flex flex-1 flex-col overflow-hidden px-2 lg:px-20">
+		<h1 class="mb-4 shrink-0 text-3xl font-medium tracking-tight">Global Chat</h1>
+
+		<!-- Chat area -->
+		<div class="flex flex-1 flex-col gap-y-4 overflow-y-auto rounded" bind:this={autoScroll.ref}>
+			{#each messages as message (message.id)}
+				<div class="flex w-full {message.username === currentUser?.username ? 'justify-end' : ''}">
+					<div class="flex flex-col">
+						<b>
+							{message.username}<span class="ml-2 text-xs text-muted-foreground">
+								{formatTime(message.timestamp)}
+							</span>
+						</b>
+						{message.message}
+					</div>
+				</div>
+			{/each}
+		</div>
+
+		<!-- Input area -->
+		<div class="mt-4 flex w-full shrink-0 items-center justify-center pb-4">
+			<Textarea
+				bind:value={messageInput}
+				placeholder="Write a message..."
+				onkeydown={handleKeydown}
+				class="min-h-[none] w-full [resize:none] lg:w-1/2"
+				rows={2}
+			/>
+			<Button class="ml-4" onclick={sendMessageInternal} disabled={!messageInput.trim()}>
+				Send
+			</Button>
+		</div>
+	</div>
+</main>

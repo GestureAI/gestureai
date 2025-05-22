@@ -1,14 +1,17 @@
 <script lang="ts">
 	import '../app.css';
 	import { ModeWatcher } from 'mode-watcher';
-	import Navbar from '$lib/components/navbar.svelte';
+	import AppSidebar from '$lib/components/app-sidebar.svelte';
+	import * as Sidebar from '$lib/components/ui/sidebar/index.js';
 
 	let { children } = $props();
 </script>
 
 <ModeWatcher />
 
-<div class="relative flex min-h-screen w-screen flex-col overflow-hidden">
-	<Navbar />
-	{@render children()}
-</div>
+<Sidebar.Provider>
+	<AppSidebar />
+	<Sidebar.Inset>
+		{@render children()}
+	</Sidebar.Inset>
+</Sidebar.Provider>

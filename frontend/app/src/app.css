@@ -28,7 +28,7 @@
 		--chart-3: 338.77 31.4% 59.41%;
 		--chart-4: 215.76 76.74% 74.71%;
 		--chart-5: 35.82 54.47% 75.88%;
-		--sidebar: 80 23.08% 94.9%;
+		--sidebar-background: 80 23.08% 94.9%;
 		--sidebar-foreground: 63.16 13.67% 27.25%;
 		--sidebar-primary: 80.4 22.94% 57.25%;
 		--sidebar-primary-foreground: 80 23.08% 97.45%;
@@ -36,9 +36,6 @@
 		--sidebar-accent-foreground: 163.45 23.97% 23.73%;
 		--sidebar-border: 81.43 18.42% 85.1%;
 		--sidebar-ring: 80.4 22.94% 57.25%;
-		--font-sans: Geist, sans-serif;
-		--font-serif: 'Lora', Georgia, serif;
-		--font-mono: 'Fira Code', 'Courier New', monospace;
 		--radius: 0.5rem;
 		--shadow-2xs: 1px 2px 5px 1px hsl(0 0% 10.2% / 0.03);
 		--shadow-xs: 1px 2px 5px 1px hsl(0 0% 10.2% / 0.03);
@@ -75,7 +72,7 @@
 		--chart-3: 338.77 31.4% 59.41%;
 		--chart-4: 215.76 76.74% 74.71%;
 		--chart-5: 35.82 54.47% 75.88%;
-		--sidebar: 70.91 21.57% 10%;
+		--sidebar-background: 70.91 21.57% 10%;
 		--sidebar-foreground: 70 36% 90.2%;
 		--sidebar-primary: 83.08 32.5% 68.63%;
 		--sidebar-primary-foreground: 70.91 18.64% 11.57%;
@@ -83,9 +80,6 @@
 		--sidebar-accent-foreground: 165.52 69.05% 83.53%;
 		--sidebar-border: 69.47 19.59% 19.02%;
 		--sidebar-ring: 83.08 32.5% 68.63%;
-		--font-sans: Geist, sans-serif;
-		--font-serif: 'Lora', Georgia, serif;
-		--font-mono: 'Fira Code', 'Courier New', monospace;
 		--radius: 0.5rem;
 		--shadow-2xs: 1px 2px 5px 1px hsl(0 0% 10.2% / 0.03);
 		--shadow-xs: 1px 2px 5px 1px hsl(0 0% 10.2% / 0.03);
