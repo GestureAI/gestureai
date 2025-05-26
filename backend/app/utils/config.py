@@ -7,25 +7,30 @@ from os import getenv
 
 @dataclass(frozen=True)
 class Config:
-    TF_MODEL_PATH: str
+    TF_MODEL_NAME: str
     DB_CONNECTION_STRING: str
     COOKIES_KEY_NAME: str
     SESSION_TIME: timedelta
     JWT_SALT: str
 
     @staticmethod
+    def _get_env_variable(name: str) -> str:
+        value = getenv(name)
+        if value is None:
+            raise ValueError(f"{name} environment variable is not set")
+        return value
+
+    @staticmethod
     def get_config() -> Config:
-        model_path = getenv("TF_MODEL_PATH")
-        db_con_str: str = getenv("DB_CONNECTION_STRING", "sqlite:///./app.db")
-        cookies_key = getenv("COOKIES_KEY_NAME", "session")
-        session_time_seconds = int(getenv("SESSION_TIME_SECONDS", 3600))
+        model_name = Config._get_env_variable("TF_MODEL_NAME")
+        db_con_str: str = Config._get_env_variable("DB_CONNECTION_STRING")
+        cookies_key = Config._get_env_variable("COOKIES_KEY")
+        jwt_salt = Config._get_env_variable("JWT_SALT")
+
+        session_time_seconds = int(Config._get_env_variable("SESSION_TIME_SECONDS"))
         session_time = timedelta(seconds=session_time_seconds)
-        hash_salt = getenv("HASH_SALT", "default_salt")
 
-        if model_path is None:
-            raise ValueError("TF_MODEL_PATH is not set")
-
-        return Config(model_path, db_con_str, cookies_key, session_time, hash_salt)
+        return Config(model_name, db_con_str, cookies_key, session_time, jwt_salt)
 
 
 CONFIG = Config.get_config()
