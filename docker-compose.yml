@@ -8,9 +8,11 @@ services:
     environment:
       PYTHONUNBUFFERED: 1
       UV_LINK_MODE: copy
-      DB_USER: $PG_USER
-      DB_PASSWORD: $PG_PASS
-      DB_NAME: $PG_DB
+      TF_MODEL_NAME: $TF_MODEL_NAME
+      DB_CONNECTION_STRING: $DB_CONNECTION_STRING
+      COOKIES_KEY: $COOKIES_KEY
+      JWT_SALT: $JWT_SALT
+      SESSION_TIME_SECONDS: $SESSION_TIME_SECONDS
 
   frontend:
     container_name: frontend
