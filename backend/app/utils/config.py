@@ -23,9 +23,15 @@ class Config:
     @staticmethod
     def get_config() -> Config:
         model_name = Config._get_env_variable("TF_MODEL_NAME")
-        db_con_str: str = Config._get_env_variable("DB_CONNECTION_STRING")
         cookies_key = Config._get_env_variable("COOKIES_KEY")
         jwt_salt = Config._get_env_variable("JWT_SALT")
+
+        db_host = getenv("DB_HOST", "localhost")
+        db_port = getenv("DB_PORT", "5432")
+        db_name = Config._get_env_variable("DB_NAME")
+        db_user = Config._get_env_variable("DB_USER")
+        db_password = Config._get_env_variable("DB_PASS")
+        db_con_str: str = f"postgresql://{db_user}:{db_password}@{db_host}:{db_port}/{db_name}"
 
         session_time_seconds = int(Config._get_env_variable("SESSION_TIME_SECONDS"))
         session_time = timedelta(seconds=session_time_seconds)

@@ -1,10 +1,12 @@
 from fastapi import FastAPI
 from fastapi import UploadFile
 
+from core import db_context
 from models import dto
 from services import fake_service
 
 
+db_context.create_tables()
 app = FastAPI(redoc_url=None, docs_url="/api/docs")
 
 
