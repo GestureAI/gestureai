@@ -1,15 +1,19 @@
 from fastapi import FastAPI
-from fastapi import UploadFile
 
 from core import db_context
-from models import dto
-from services import fake_service
+from controllers.api import prediction_controller
+from controllers.view import view_controller
 
 
 db_context.create_tables()
-app = FastAPI(redoc_url=None, docs_url="/api/docs")
+app = FastAPI(redoc_url=None, docs_url="/api/docs")  # api app
+view = FastAPI(redoc_url=None, docs_url=None)  # view app
 
 
-@app.post("/api/check", response_model=dto.PredictionDTO)
-def predict_sign(file: UploadFile):
-    return fake_service.fake_response()
+# Mount routers
+app.include_router(prediction_controller.router, prefix="/api")
+view.include_router(view_controller.router)
+
+
+# mount panel app to the main api app
+app.mount("/api/admin", view)  # Mount the view app under /api/view
