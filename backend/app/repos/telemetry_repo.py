@@ -30,8 +30,8 @@ def get(limit: int = 100, offset: int = 0) -> list[TelemetryDb]:
     with session_maker() as session:
         return (
             session.query(TelemetryDb)
+            .order_by(TelemetryDb.created_at.desc())
             .limit(limit)
             .offset(offset)
-            .order_by(TelemetryDb.created_at.desc())
             .all()
         )
