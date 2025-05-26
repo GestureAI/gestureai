@@ -9,7 +9,9 @@ services:
       PYTHONUNBUFFERED: 1
       UV_LINK_MODE: copy
       TF_MODEL_NAME: $TF_MODEL_NAME
-      DB_CONNECTION_STRING: $DB_CONNECTION_STRING
+      DB_USER: $DB_USER
+      DB_PASS: $DB_PASS
+      DB_NAME: $DB_NAME
       COOKIES_KEY: $COOKIES_KEY
       JWT_SALT: $JWT_SALT
       SESSION_TIME_SECONDS: $SESSION_TIME_SECONDS
@@ -33,9 +35,9 @@ services:
     image: postgres:17-alpine
     restart: always
     environment:
-      POSTGRES_USER: $PG_USER
-      POSTGRES_PASSWORD: $PG_PASS
-      POSTGRES_DB: $PG_DB
+      POSTGRES_USER: $DB_USER
+      POSTGRES_PASSWORD: $DB_PASS
+      POSTGRES_DB: $DB_NAME
     volumes:
       - "./data:/var/lib/postgresql/data/"
 
