@@ -14,6 +14,8 @@
 	import { usernameStore } from '$lib/stores';
 	import { UseAutoScroll } from '$lib/hooks/use-auto-scroll.svelte';
 	import { Paperclip, ArrowUp, Hand } from '@lucide/svelte';
+	import GestureAIDialog from '$lib/components/gesture-ai-dialog.svelte';
+
 	const autoScroll = new UseAutoScroll();
 
 	// For WS communication and ui state
@@ -54,6 +56,7 @@
 		username: string;
 	}
 
+	let gestureAIDialogOpen = $state<boolean>(false);
 	let messages = $state<DisplayMessage[]>([]);
 	let currentUser = $state<User | null>(null);
 	let messageInput = $state<string>('');
@@ -236,7 +239,9 @@
 	});
 </script>
 
-<div class="flex h-screen max-h-screen flex-col overflow-hidden">
+<GestureAIDialog bind:gestureAIDialogOpen />
+
+<div class="flex flex-grow flex-col overflow-hidden">
 	<!-- Header with sidebar logic and breadcrumb component -->
 	<header class="flex h-16 shrink-0 items-center justify-between gap-2">
 		<div class="flex items-center gap-2 px-4">
@@ -327,6 +332,9 @@
 							<!-- Open modal for  AI sign language recognition -->
 							<button
 								class="inline-flex h-auto items-center gap-2 rounded-full border border-secondary-foreground/10 px-2 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted/40 hover:text-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 max-sm:p-2"
+								onclick={() => {
+									gestureAIDialogOpen = true;
+								}}
 							>
 								<Hand class="size-4 shrink-0" />
 								<span class="max-sm:hidden">Gesture AI</span>
