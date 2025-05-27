@@ -9,6 +9,7 @@ from os import getenv
 class Config:
     TF_MODEL_NAME: str
     DB_CONNECTION_STRING: str
+    PANEL_PASSWORD: str
     COOKIES_KEY_NAME: str
     SESSION_TIME: timedelta
     JWT_SALT: str
@@ -25,18 +26,23 @@ class Config:
         model_name = Config._get_env_variable("TF_MODEL_NAME")
         cookies_key = Config._get_env_variable("COOKIES_KEY")
         jwt_salt = Config._get_env_variable("JWT_SALT")
+        panel_password = Config._get_env_variable("PANEL_PASSWORD")
 
         db_host = getenv("DB_HOST", "localhost")
         db_port = getenv("DB_PORT", "5432")
         db_name = Config._get_env_variable("DB_NAME")
         db_user = Config._get_env_variable("DB_USER")
         db_password = Config._get_env_variable("DB_PASS")
-        db_con_str: str = f"postgresql://{db_user}:{db_password}@{db_host}:{db_port}/{db_name}"
+        db_con_str: str = (
+            f"postgresql://{db_user}:{db_password}@{db_host}:{db_port}/{db_name}"
+        )
 
         session_time_seconds = int(Config._get_env_variable("SESSION_TIME_SECONDS"))
         session_time = timedelta(seconds=session_time_seconds)
 
-        return Config(model_name, db_con_str, cookies_key, session_time, jwt_salt)
+        return Config(
+            model_name, db_con_str, panel_password, cookies_key, session_time, jwt_salt
+        )
 
 
 CONFIG = Config.get_config()
