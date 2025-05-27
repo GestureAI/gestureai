@@ -1,10 +1,11 @@
 from fastapi import APIRouter
-from fastapi.responses import PlainTextResponse
+from fastapi.requests import Request
+from core.jinja_context import templates
 
 
 router = APIRouter(tags=["Pages"])
 
 
 @router.get("/")  # Root endpoint for the view app
-def root():
-    return PlainTextResponse("Welcome to the Panel App!")
+async def root(req: Request):
+    return templates.TemplateResponse(req, "test.jinja", {"key": "Some value"})
