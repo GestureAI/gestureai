@@ -10,49 +10,49 @@
 		navMain: [
 			{
 				title: 'Public',
-				url: '#',
+				url: '/',
 				icon: MessageSquare,
 				isActive: true,
 				items: [
 					{
 						title: 'Global Chat',
-						url: '#'
+						url: '/'
 					},
 					{
 						title: 'Temporary Chat',
-						url: '#'
+						url: '/'
 					},
 					{
 						title: "User525's Chat",
-						url: '#'
+						url: '/'
 					},
 					{
 						title: "User526's Chat",
-						url: '#'
+						url: '/'
 					}
 				]
 			},
 			{
 				title: 'Private',
-				url: '#',
+				url: '/',
 				icon: MessageSquare,
 				isActive: true,
 				items: [
 					{
 						title: 'Group Chat 1',
-						url: '#'
+						url: '/'
 					},
 					{
 						title: 'Group Chat 2',
-						url: '#'
+						url: '/'
 					},
 					{
 						title: 'Group Chat 3',
-						url: '#'
+						url: '/'
 					},
 					{
 						title: 'Group Chat 4',
-						url: '#'
+						url: '/'
 					}
 				]
 			}

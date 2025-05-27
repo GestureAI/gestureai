@@ -9,9 +9,11 @@
 
 <ModeWatcher />
 
-<Sidebar.Provider>
-	<AppSidebar />
-	<Sidebar.Inset>
-		{@render children()}
-	</Sidebar.Inset>
-</Sidebar.Provider>
+<div class="flex max-h-screen">
+	<Sidebar.Provider>
+		<AppSidebar />
+		<Sidebar.Inset>
+			{@render children()}
+		</Sidebar.Inset>
+	</Sidebar.Provider>
+</div>
