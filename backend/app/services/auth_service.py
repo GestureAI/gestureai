@@ -4,6 +4,7 @@ from datetime import timezone
 from fastapi.requests import Request
 from fastapi import HTTPException
 from fastapi.responses import Response
+from fastapi.responses import RedirectResponse
 
 from core import jwt_context
 from models import dto
@@ -21,8 +22,10 @@ def login(res: Response, data: dto.LoginDTO):
     res.set_cookie(key=CONFIG.COOKIES_KEY_NAME, value=json_token)
 
 
-def logout():
-    pass
+def logout(res: Response):
+    res = RedirectResponse("/api/admin/login")
+    res.delete_cookie(key=CONFIG.COOKIES_KEY_NAME)
+    return res
 
 
 def validate_token(req: Request, res: Response) -> bool:
