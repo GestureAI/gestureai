@@ -10,4 +10,4 @@ router = APIRouter(tags=["Prediction"])
 
 @router.post("/check", response_model=dto.PredictionDTO)
 def predict_sign(file: UploadFile):
-    return model_service.predict(file.file.read())
+    return model_service.predict_with_telemetry(file.file.read())

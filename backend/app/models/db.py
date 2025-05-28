@@ -18,7 +18,6 @@ class TelemetryDb(Base):
     id = mapped_column("id", Integer, primary_key=True, autoincrement=True)
     precision = mapped_column("precision", Float, nullable=False)
     letter = mapped_column("letter", VARCHAR(1), nullable=False)
-    prediction_time = mapped_column("prediction_time", Integer, nullable=False)
     response_time = mapped_column("response_time", Integer, nullable=False)
     model_name = mapped_column("model_name", String, nullable=False)
     created_at = mapped_column(

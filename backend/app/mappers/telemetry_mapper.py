@@ -20,7 +20,6 @@ def db_to_dto(telemetry: TelemetryDb) -> TelemetryDTO:
         id=telemetry.id,
         precision=telemetry.precision,
         letter=telemetry.letter,
-        prediction_time=telemetry.prediction_time,
         response_time=telemetry.response_time,
         model_name=telemetry.model_name,
         created_at=created_at.isoformat(),
