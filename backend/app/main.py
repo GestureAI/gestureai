@@ -3,6 +3,7 @@ from fastapi import FastAPI
 from core import db_context
 from controllers.api import prediction_controller
 from controllers.view import view_controller
+from services import model_service
 
 
 db_context.create_tables()
