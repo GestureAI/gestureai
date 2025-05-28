@@ -38,19 +38,12 @@
 
 	type DisplayMessage = ChatMessageFromServer | PendingChatMessage;
 
-	interface WelcomeMessage {
-		type: 'welcome';
-		username: string;
-		message: string;
-		timestamp: number;
-	}
-
 	interface HistoryMessage {
 		type: 'history';
 		messages: ChatMessageFromServer[]; // History only contains server-confirmed messages
 	}
 
-	type WebSocketIncomingData = WelcomeMessage | HistoryMessage | ChatMessageFromServer;
+	type WebSocketIncomingData = HistoryMessage | ChatMessageFromServer;
 
 	interface User {
 		username: string;
@@ -58,9 +51,9 @@
 
 	let gestureAIDialogOpen = $state<boolean>(false);
 	let messages = $state<DisplayMessage[]>([]);
-	let currentUser = $state<User | null>(null);
 	let messageInput = $state<string>('');
 	let isConnected = $state<boolean>(false);
+	let currentUser = $derived<User>({ username: $usernameStore });
 
 	let currentWebSocket: WebSocket | null = null;
 	let connectionAttempts = 0;
@@ -107,6 +100,15 @@
 
 			currentWebSocket.onopen = () => {
 				console.log('[Client WS] onopen: Connection successful!');
+				// Send username immediately after connection
+				if (currentWebSocket && $usernameStore) {
+					currentWebSocket.send(
+						JSON.stringify({
+							type: 'set_username',
+							username: $usernameStore
+						})
+					);
+				}
 				isConnected = true;
 				// Reset attempts on successful connection
 				connectionAttempts = 0;
@@ -120,9 +122,7 @@
 				const data = JSON.parse(event.data) as WebSocketIncomingData;
 				console.log('[Client WS] onmessage: Received:', data);
 
-				if (data.type === 'welcome') {
-					currentUser = { username: data.username };
-				} else if (data.type === 'history') {
+				if (data.type === 'history') {
 					// Add history messages, filtering out any already present
 					const newHistoryMessages = data.messages.filter(
 						(histMsg) => !messages.some((existingMsg) => existingMsg.id === histMsg.id)
@@ -196,7 +196,7 @@
 		const pendingMsg: PendingChatMessage = {
 			id: `client-${crypto.randomUUID()}`,
 			type: 'message',
-			username: currentUser.username,
+			username: $usernameStore,
 			message: messageText,
 			timestamp: Date.now()
 		};
@@ -229,13 +229,6 @@
 				currentWebSocket = null;
 			}
 		};
-	});
-
-	// Set username store value so it can be used in sidebar component
-	$effect(() => {
-		if (currentUser?.username) {
-			usernameStore.set(currentUser.username);
-		}
 	});
 </script>
 
@@ -285,7 +278,7 @@
 			bind:this={autoScroll.ref}
 		>
 			{#each messages as message (message.id)}
-				<div class="flex w-full {message.username === currentUser?.username ? 'justify-end' : ''}">
+				<div class="flex w-full {message.username === $usernameStore ? 'justify-end' : ''}">
 					<div class="flex flex-col">
 						<b>
 							{message.username}<span class="ml-2 text-xs text-muted-foreground">
