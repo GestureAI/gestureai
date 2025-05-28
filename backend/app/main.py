@@ -1,13 +1,13 @@
 from fastapi import FastAPI
 
 from core import db_context
+from core.lifespan import lifespan
 from controllers.api import prediction_controller
 from controllers.view import view_controller
-from services import model_service
 
 
 db_context.create_tables()
-app = FastAPI(redoc_url=None, docs_url="/api/docs")  # api app
+app = FastAPI(redoc_url=None, docs_url="/api/docs", lifespan=lifespan)  # api app
 view = FastAPI(redoc_url=None, docs_url=None)  # view app
 
 
