@@ -5,7 +5,6 @@ from utils.config import CONFIG
 def create(
     precision: float,
     letter: str,
-    prediction_time: int,
     response_time: int,
 ) -> TelemetryDb:
     """
@@ -17,7 +16,6 @@ def create(
     return TelemetryDb(
         precision=precision,
         letter=letter,
-        prediction_time=prediction_time,
         response_time=response_time,
         model_name=CONFIG.TF_MODEL_NAME,
     )
