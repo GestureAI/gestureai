@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin panel</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.4/css/bulma.min.css">
+</head>
+
+<body>
+    <nav class="navbar" role="navigation" aria-label="main navigation">
+        <div class="navbar-brand">
+            <a class="navbar-item" href="/api/admin/">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                    class="lucide-icon lucide lucide-command size-4"><!--[--><!---->
+                    <path d="M15 6v12a3 3 0 1 0 3-3H6a3 3 0 1 0 3 3V6a3 3 0 1 0-3 3h12a3 3 0 1 0-3-3"><!----></path>
+                    <!----><!--]--><!----><!---->
+                </svg>
+
+            </a>
+
+            <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false"
+                data-target="navbarBasicExample">
+                <span aria-hidden="true"></span>
+                <span aria-hidden="true"></span>
+                <span aria-hidden="true"></span>
+                <span aria-hidden="true"></span>
+            </a>
+        </div>
+
+        <div id="navbarBasicExample" class="navbar-menu">
+            <div class="navbar-start">
+                <a class="navbar-item" href="/api/admin/lasts-responses">
+                    Lasts 100 responses
+                </a>
+                <a class="navbar-item has-text-warning" href="/api/admin/live">
+                    Live mode
+                </a>
+            </div>
+
+            <div class="navbar-end">
+                <div class="navbar-item">
+                    <div class="buttons">
+                        <a class="button is-danger" href="/api/admin/logout">
+                            Log out
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+    <div class="container ">
+        <h1 class="title" style="margin-top: 1em;">Live mode for the test model</h1>
+        <video id="video" autoplay playsinline></video>
+        <canvas id="canvas"></canvas>
+        <h2 class="subtitle " id="status"></h2>
+        <h2 class="title is-2" id="char"></h2>
+        <button id="clear" class="button">Clear</button>
+    </div>
+
+    <script>
+        const video = document.getElementById("video");
+        const canvas = document.getElementById("canvas");
+        const captureBtn = document.getElementById("captureBtn");
+        const uploadBtn = document.getElementById("uploadBtn");
+        const message = document.getElementById("status");
+        const charTag = document.getElementById("char");
+        const clearBtn = document.getElementById("clear");
+        let capturedImage = null;
+
+        const answers = [];
+
+
+        clearBtn.addEventListener("click", () => {
+            message.textContent = "123";
+            answers.length = 0;
+            charTag.textContent = "456";
+        });
+
+        // Start camera capture
+        async function startCamera() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({
+                    video: true,
+                });
+                video.srcObject = stream;
+            } catch (error) {
+                console.error("Can not connect to camera", error);
+            }
+        }
+
+        // Get photo from the camera and send it to the server
+        async function makePrediction() {
+            const context = canvas.getContext("2d");
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+            canvas.toBlob(async (blob) => {
+                await sendRequest(blob);
+            }, 'image/png');
+        }
+
+        // Send the captured image to the server
+        async function sendRequest(image) {
+            const formData = new FormData();
+            formData.append('file', image, 'image.png');
+
+            const response = await fetch("/api/check", {
+                method: "POST",
+                headers: {
+                    Accept: "application/json",
+                },
+                body: formData,
+            });
+
+            if (!response.ok) {
+                throw new Error(`Error: ${response.status}`);
+            }
+
+            const result = await response.json();
+
+            if (answers.length >= 10) {
+                answers.shift();
+            }
+
+            if (result.is_recognized) {
+                answers.push(result.char);
+                charTag.textContent = result.char;
+            }
+            else if (answers.length > 0) {
+                const mostFrequentChar = answers.sort((a, b) =>
+                    answers.filter(v => v === b).length - answers.filter(v => v === a).length
+                )[0];
+                message.textContent += mostFrequentChar;
+                answers.length = 0;
+                charTag.textContent = "";
+            }
+        }
+
+        startCamera();
+
+        message.textContent = "";
+        setInterval(makePrediction, 500);
+    </script>
+
+</body>
+
+</html>
