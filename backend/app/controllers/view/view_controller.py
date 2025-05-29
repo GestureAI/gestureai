@@ -27,12 +27,17 @@ async def lasts_responses(req: Request, is_valid: dependencies.token_dependency)
     return page_service.show_lasts_responses_page(req, is_valid)
 
 
+@router.get("/logout")
+async def logout(res: Response):
+    return auth_service.logout(res)
+
+
+@router.get("/live")
+async def live(req: Request, is_valid: dependencies.token_dependency):
+    return page_service.show_live_page(req, is_valid)
+
+
 # api
 @router.post("/login")
 async def login_post(res: Response, data: dto.LoginDTO):
     return auth_service.login(res, data)
-
-
-@router.get("/logout")
-async def logout(res: Response):
-    return auth_service.logout(res)

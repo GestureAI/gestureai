@@ -90,4 +90,4 @@ def _send_to_model(image) -> dto.PredictionDTO:
     char_prediction = _ANSWERS[result]
     precision = prediction[0][result]
 
-    return prediciton_factory.create(char_prediction, float(precision), 0.2)
+    return prediciton_factory.create(char_prediction, float(precision), 0.1)

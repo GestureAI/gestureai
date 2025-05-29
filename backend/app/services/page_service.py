@@ -17,6 +17,13 @@ def show_404_page():
     return RedirectResponse("/api/admin/")
 
 
+def show_live_page(req: Request, is_valid: bool):
+    if is_valid is False:
+        return RedirectResponse("/api/admin/login")
+
+    return templates.TemplateResponse(req, "live.jinja")
+
+
 def show_panel_page(req: Request, is_valid: bool):
     if is_valid is False:
         return RedirectResponse("/api/admin/login")

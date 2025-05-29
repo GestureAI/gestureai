@@ -8,7 +8,7 @@ def get_avg_min_max(dataset: list[TelemetryDTO]) -> AnalyzeDTO:
 
     response_times = [t.response_time for t in dataset]
     precision_values = [t.precision for t in dataset]
-    characters = [t.letter for t in dataset]
+    characters = [t.letter for t in dataset if t.letter != ""]
 
     # Calculate averages, min, and max for response times
     response_times_avg = sum(response_times) / len(response_times)
