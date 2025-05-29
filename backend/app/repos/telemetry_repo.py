@@ -1,5 +1,6 @@
-from core.db_context import session_maker
+from datetime import datetime
 
+from core.db_context import session_maker
 from models.db import TelemetryDb
 
 
@@ -33,5 +34,25 @@ def get(limit: int = 100, offset: int = 0) -> list[TelemetryDb]:
             .order_by(TelemetryDb.created_at.desc())
             .limit(limit)
             .offset(offset)
+            .all()
+        )
+
+
+def get_younger_than(age: datetime) -> list[TelemetryDb]:
+    """
+    Retrieves telemetry records that are younger than a specified age in minutes.
+
+    Args:
+        age (int): The age in minutes to filter the telemetry records.
+
+    Returns:
+        list[TelemetryDb]: A list of telemetry records that are younger than the specified age.
+    """
+
+    with session_maker() as session:
+        return (
+            session.query(TelemetryDb)
+            .filter(TelemetryDb.created_at >= age)
+            .order_by(TelemetryDb.created_at.desc())
             .all()
         )

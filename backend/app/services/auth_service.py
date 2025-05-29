@@ -19,7 +19,7 @@ def login(res: Response, data: dto.LoginDTO):
     exp_date = datetime.now(timezone.utc) + CONFIG.SESSION_TIME
     json_token = jwt_context.encode({}, exp_date)
 
-    res.set_cookie(key=CONFIG.COOKIES_KEY_NAME, value=json_token)
+    res.set_cookie(key=CONFIG.COOKIES_KEY_NAME, value=json_token, expires=CONFIG.SESSION_TIME.seconds)
 
 
 def logout(res: Response):
@@ -28,16 +28,15 @@ def logout(res: Response):
     return res
 
 
-def validate_token(req: Request, res: Response) -> bool:
+def validate_token(req: Request) -> bool:
     token = req.cookies.get(CONFIG.COOKIES_KEY_NAME)
     if not token:
-        res.delete_cookie(key=CONFIG.COOKIES_KEY_NAME)
         return False
 
     try:
-        jwt_context.decode(token)
-        return True
+        data = jwt_context.decode(token)
+        return data is not None
+
     except Exception as e:
         print(f"Token validation failed: {e}")
-        res.delete_cookie(key=CONFIG.COOKIES_KEY_NAME)
         return False

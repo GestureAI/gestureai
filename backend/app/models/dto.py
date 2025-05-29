@@ -21,3 +21,14 @@ class TelemetryDTO:
 @dataclass
 class LoginDTO:
     password: str
+
+
+@dataclass
+class AnalyzeDTO:
+    response_times_avg: float
+    response_times_min: float
+    response_times_max: float
+    precision_avg: float
+    precision_min: float
+    precision_max: float
+    most_common_char: str
