@@ -8,9 +8,14 @@ services:
     environment:
       PYTHONUNBUFFERED: 1
       UV_LINK_MODE: copy
-      DB_USER: $PG_USER
-      DB_PASSWORD: $PG_PASS
-      DB_NAME: $PG_DB
+      TF_MODEL_NAME: $TF_MODEL_NAME
+      DB_USER: $DB_USER
+      DB_PASS: $DB_PASS
+      DB_NAME: $DB_NAME
+      PANEL_PASSWORD: $PANEL_PASSWORD
+      COOKIES_KEY: $COOKIES_KEY
+      JWT_SALT: $JWT_SALT
+      SESSION_TIME_SECONDS: $SESSION_TIME_SECONDS
 
   frontend:
     container_name: frontend
@@ -31,9 +36,9 @@ services:
     image: postgres:17-alpine
     restart: always
     environment:
-      POSTGRES_USER: $PG_USER
-      POSTGRES_PASSWORD: $PG_PASS
-      POSTGRES_DB: $PG_DB
+      POSTGRES_USER: $DB_USER
+      POSTGRES_PASSWORD: $DB_PASS
+      POSTGRES_DB: $DB_NAME
     volumes:
       - "./data:/var/lib/postgresql/data/"
 

@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login to GestureAI panel</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.4/css/bulma.min.css">
+</head>
+
+<body>
+    <form id="loginForm" class="custom_container box" style="margin-top: 1em">
+        <div class="field">
+            <label class="label">Password</label>
+            <div class="control">
+                <input class="input" id="password" type="password" placeholder="********" required/>
+            </div>
+        </div>
+        <button class="button is-primary" style="width: 100%;">Sign in</button>
+        <br/>
+        <p id="errorMessage" class="has-text-danger"></p>
+
+    </form>
+
+    <script>
+        const form = document.getElementById('loginForm');
+        const passwordInput = document.getElementById('password');
+        const errorMessage = document.getElementById('errorMessage');
+
+        form.addEventListener('submit', async function (event) {
+            // disable default form submission
+            event.preventDefault();
+
+            // Send login request to the server
+            const resp = await fetch('/api/admin/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ password: passwordInput.value })
+            });
+
+            const data = await resp.json();
+            if (resp.ok) {
+                // Redirect to the admin panel on successful login
+                window.location.href = '/api/admin/';
+            } else {
+                // Show error message
+                errorMessage.textContent = data.detail || 'Login failed. Please try again.';
+            }
+
+        });
+    </script>
+
+    <style>
+        .custom_container {
+            margin: auto;
+            max-width: 400px;
+        }
+
+        #errorMessage {
+            margin-top: 10px;
+        }
+    </style>
+</body>
+
+</html>

@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin panel</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.4/css/bulma.min.css">
+</head>
+
+<body>
+    <nav class="navbar" role="navigation" aria-label="main navigation">
+        <div class="navbar-brand">
+            <a class="navbar-item" href="/api/admin/">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                    class="lucide-icon lucide lucide-command size-4"><!--[--><!---->
+                    <path d="M15 6v12a3 3 0 1 0 3-3H6a3 3 0 1 0 3 3V6a3 3 0 1 0-3 3h12a3 3 0 1 0-3-3"><!----></path>
+                    <!----><!--]--><!----><!---->
+                </svg>
+
+            </a>
+
+            <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false"
+                data-target="navbarBasicExample">
+                <span aria-hidden="true"></span>
+                <span aria-hidden="true"></span>
+                <span aria-hidden="true"></span>
+                <span aria-hidden="true"></span>
+            </a>
+        </div>
+
+        <div id="navbarBasicExample" class="navbar-menu">
+            <div class="navbar-start">
+                <a class="navbar-item" href="/api/admin/lasts-responses">
+                    Lasts 100 responses
+                </a>
+                <a class="navbar-item has-text-warning" href="/api/admin/live">
+                    Live mode
+                </a>
+            </div>
+
+            <div class="navbar-end">
+                <div class="navbar-item">
+                    <div class="buttons">
+                        <a class="button is-danger" href="/api/admin/logout">
+                            Log out
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+    <div class="container ">
+        <h1 class="title" style="margin-top: 1em">Prediction Statistics for Different Periods</h1>
+
+        <table class="table is-fullwidth">
+            <thead>
+                <tr>
+                    <th>Timeframe</th>
+                    <th>Response avg</th>
+                    <th>Response max</th>
+                    <th>Response min</th>
+                    <th>Precision avg</th>
+                    <th>Precision max</th>
+                    <th>Precision min</th>
+                    <th>Common char</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for key, analyze in analyzes.items() %}
+                <tr>
+                    <td>{{key}}</td>
+                    <td>{{analyze.response_times_avg}}</td>
+                    <td>{{analyze.response_times_max}}</td>
+                    <td>{{analyze.response_times_min}}</td>
+                    <td>{{analyze.precision_avg}}</td>
+                    <td>{{analyze.precision_max}}</td>
+                    <td>{{analyze.precision_min}}</td>
+                    <td>{{analyze.most_common_char}}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+</body>
+
+</html>
