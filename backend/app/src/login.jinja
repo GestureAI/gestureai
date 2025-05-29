@@ -5,19 +5,22 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login to GestureAI panel</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.4/css/bulma.min.css">
 </head>
 
 <body>
-    <div class="container">
-        <h1>Login to GestureAI panel</h1>
-        <form method="POST" id="loginForm">
-            <label for="password">Password:</label>
-            <input type="password" id="password" name="password" required>
-            <br>
-            <button type="submit">Login</button>
-        </form>
-        <p id="errorMessage" style="color: red;"></p>
-    </div>
+    <form id="loginForm" class="custom_container box" style="margin-top: 1em">
+        <div class="field">
+            <label class="label">Password</label>
+            <div class="control">
+                <input class="input" id="password" type="password" placeholder="********" required/>
+            </div>
+        </div>
+        <button class="button is-primary" style="width: 100%;">Sign in</button>
+        <br/>
+        <p id="errorMessage" class="has-text-danger"></p>
+
+    </form>
 
     <script>
         const form = document.getElementById('loginForm');
@@ -50,16 +53,13 @@
     </script>
 
     <style>
-        .container {
+        .custom_container {
+            margin: auto;
             max-width: 400px;
-            margin: 0 auto;
-            padding: 20px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            background-color: #f9f9f9;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
+        }
+
+        #errorMessage {
+            margin-top: 10px;
         }
     </style>
 </body>

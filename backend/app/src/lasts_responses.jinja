@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin panel</title>
+    <title>Lasts 100 responses</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.4/css/bulma.min.css">
 </head>
 
@@ -49,39 +49,33 @@
             </div>
         </div>
     </nav>
+
     <div class="container ">
-        <h1 class="title" style="margin-top: 1em">Prediction Statistics for Different Periods</h1>
+        <h1 class="title" style="margin-top: 1em">Lasts 100 responses</h1>
 
         <table class="table is-fullwidth">
             <thead>
                 <tr>
-                    <th>Timeframe</th>
-                    <th>Response avg</th>
-                    <th>Response max</th>
-                    <th>Response min</th>
-                    <th>Precision avg</th>
-                    <th>Precision max</th>
-                    <th>Precision min</th>
-                    <th>Common char</th>
+                    <th><abbr title="Precision">Precision</abbr></th>
+                    <th><abbr title="Symbol">Symbol</abbr></th>
+                    <th><abbr title="Response time">ms</abbr></th>
+                    <th><abbr title="Model name">Model</abbr></th>
+                    <th><abbr title="Time">Time</abbr></th>
                 </tr>
             </thead>
             <tbody>
-                {% for key, analyze in analyzes.items() %}
+                {% for telemetry in telemetries %}
                 <tr>
-                    <td>{{key}}</td>
-                    <td>{{analyze.response_times_avg}}</td>
-                    <td>{{analyze.response_times_max}}</td>
-                    <td>{{analyze.response_times_min}}</td>
-                    <td>{{analyze.precision_avg}}</td>
-                    <td>{{analyze.precision_max}}</td>
-                    <td>{{analyze.precision_min}}</td>
-                    <td>{{analyze.most_common_char}}</td>
+                    <td>{{ telemetry.precision }}</td>
+                    <td>{{ telemetry.letter }}</td>
+                    <td>{{ telemetry.response_time }}</td>
+                    <td>{{ telemetry.model_name }}</td>
+                    <td>{{ telemetry.created_at }}</td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
     </div>
-
 </body>
 
 </html>
