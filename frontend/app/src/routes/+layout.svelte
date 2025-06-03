@@ -5,10 +5,14 @@
 	import * as Sidebar from '$lib/components/ui/sidebar/index.js';
 	import { usernameStore } from '$lib/stores';
 	import UsernameDialog from '$lib/components/username-dialog.svelte';
+	import { Toaster } from '$lib/components/ui/sonner/index.js';
+
 	let { children } = $props();
 </script>
 
+<Toaster />
 <ModeWatcher />
+
 {#if $usernameStore}
 	<div class="flex max-h-screen">
 		<Sidebar.Provider>
