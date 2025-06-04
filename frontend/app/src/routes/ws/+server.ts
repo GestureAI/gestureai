@@ -54,7 +54,7 @@ export const socket: Socket = {
 				console.log(`[WS Server] Peer ${peerId} (${newUsername}) subscribed to 'chat'.`);
 
 				// Send message history
-				const recentMessages = await chatService.getRecentMessages(50);
+				const recentMessages = await chatService.getRecentMessages(100);
 				const userMessagesHistory = recentMessages.filter((msg) => msg.type === 'message');
 				if (userMessagesHistory.length > 0) {
 					peer.send(JSON.stringify({ type: 'history', messages: userMessagesHistory }));

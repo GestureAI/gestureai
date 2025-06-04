@@ -61,7 +61,7 @@ export class RedisChatService {
 		return message;
 	}
 
-	public async getRecentMessages(limit = 50): Promise<ChatMessage[]> {
+	public async getRecentMessages(limit = 100): Promise<ChatMessage[]> {
 		const client = await this.getClient();
 		const messageStrings = await client.zRange('chat:messages', -limit, -1);
 		return messageStrings.map((msgStr) => JSON.parse(msgStr) as ChatMessage);

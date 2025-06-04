@@ -1,5 +1,5 @@
 <script lang="ts">
-	import * as Dialog from '$lib/components/ui/dialog/index.js';
+	import * as AlertDialog from '$lib/components/ui/alert-dialog/index.js';
 	import { Button } from '$lib/components/ui/button/index.js';
 	import { Input } from '$lib/components/ui/input/index.js';
 	import { Label } from '$lib/components/ui/label/index.js';
@@ -17,14 +17,14 @@
 	}
 </script>
 
-<Dialog.Root bind:open={usernameDialogOpen}>
-	<Dialog.Content>
-		<Dialog.Header>
-			<Dialog.Title>Choose Your Username</Dialog.Title>
-			<Dialog.Description>
+<AlertDialog.Root bind:open={usernameDialogOpen}>
+	<AlertDialog.Content>
+		<AlertDialog.Header>
+			<AlertDialog.Title>Choose Your Username</AlertDialog.Title>
+			<AlertDialog.Description>
 				Please enter a username to join the chat. This will be visible to other users.
-			</Dialog.Description>
-		</Dialog.Header>
+			</AlertDialog.Description>
+		</AlertDialog.Header>
 		<form onsubmit={handleSubmit}>
 			<Label for="username">Username</Label>
 			<Input
@@ -36,9 +36,9 @@
 				bind:value={username}
 			/>
 
-			<Dialog.Footer class="pt-4">
+			<AlertDialog.Footer class="pt-4">
 				<Button type="submit" disabled={!username.trim()}>Join Chat</Button>
-			</Dialog.Footer>
+			</AlertDialog.Footer>
 		</form>
-	</Dialog.Content>
-</Dialog.Root>
+	</AlertDialog.Content>
+</AlertDialog.Root>
