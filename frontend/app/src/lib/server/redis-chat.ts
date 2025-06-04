@@ -28,7 +28,7 @@ export class RedisChatService {
 	public async initialize(): Promise<void> {
 		if (this.initialized) return;
 		this.client = createClient({
-			url: import.meta.env.VITE_REDIS_URL || 'redis://localhost:6379'
+			url: import.meta.env.VITE_REDIS_URL || 'redis://redis:6379'
 		});
 		this.client.on('error', (err) => console.error('Redis Client Error:', err));
 		await this.client.connect();
