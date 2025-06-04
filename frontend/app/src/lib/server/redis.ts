@@ -7,7 +7,7 @@ let client: RedisClientType;
 const initializeClient = (): RedisClientType => {
 	if (!client) {
 		client = createClient({
-			url: import.meta.env.VITE_REDIS_URL || 'redis://localhost:6379'
+			url: import.meta.env.VITE_REDIS_URL || 'redis://redis:6379'
 		});
 
 		// Connection handling

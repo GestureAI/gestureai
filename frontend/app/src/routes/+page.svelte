@@ -1,4 +1,12 @@
 <script lang="ts">
+	import type {
+		UploadedFile,
+		ChatMessageFromServer,
+		PendingChatMessage,
+		DisplayMessage,
+		WebSocketIncomingData,
+		User
+	} from '$lib/types';
 	import {
 		Breadcrumb,
 		BreadcrumbItem,
@@ -13,47 +21,29 @@
 	import { Badge } from '$lib/components/ui/badge/index.js';
 	import { usernameStore } from '$lib/stores';
 	import { UseAutoScroll } from '$lib/hooks/use-auto-scroll.svelte';
-	import { Paperclip, ArrowUp, Hand } from '@lucide/svelte';
+	import { Paperclip, ArrowUp, Hand, X } from '@lucide/svelte';
 	import GestureAIDialog from '$lib/components/gesture-ai-dialog.svelte';
+	import { createUploadThing } from '$lib/utils/uploadthing';
+	import { toast } from 'svelte-sonner';
+
+	const { startUpload } = createUploadThing('imageUploader', {});
 
 	const autoScroll = new UseAutoScroll();
-
-	// For WS communication and ui state
-	interface ChatMessageFromServer {
-		id: string; // Server generated ID.
-		type: 'message';
-		username: string;
-		message: string;
-		timestamp: number;
-	}
-
-	// For messages added to the ui immediately by the sender, pending server confirmation.
-	interface PendingChatMessage {
-		id: `client-${string}`; // Temporary client-side ID, e.g., "client-uuid".
-		type: 'message';
-		username: string;
-		message: string;
-		timestamp: number;
-	}
-
-	type DisplayMessage = ChatMessageFromServer | PendingChatMessage;
-
-	interface HistoryMessage {
-		type: 'history';
-		messages: ChatMessageFromServer[]; // History only contains server-confirmed messages
-	}
-
-	type WebSocketIncomingData = HistoryMessage | ChatMessageFromServer;
-
-	interface User {
-		username: string;
-	}
 
 	let gestureAIDialogOpen = $state<boolean>(false);
 	let messages = $state<DisplayMessage[]>([]);
 	let messageInput = $state<string>('');
 	let isConnected = $state<boolean>(false);
 	let currentUser = $derived<User>({ username: $usernameStore });
+	let imageFile = $state<UploadedFile | null>(null);
+	let finalText = $state<string>('');
+
+	// Assign text from gestureAI predictiion to the message input
+	$effect(() => {
+		if (finalText) {
+			messageInput = finalText;
+		}
+	});
 
 	let currentWebSocket: WebSocket | null = null;
 	let connectionAttempts = 0;
@@ -191,6 +181,7 @@
 		) {
 			return;
 		}
+		imageFile = null;
 		const messageText = messageInput.trim();
 
 		const pendingMsg: PendingChatMessage = {
@@ -232,7 +223,7 @@
 	});
 </script>
 
-<GestureAIDialog bind:gestureAIDialogOpen />
+<GestureAIDialog bind:gestureAIDialogOpen bind:finalText />
 
 <div class="flex flex-grow flex-col overflow-hidden">
 	<!-- Header with sidebar logic and breadcrumb component -->
@@ -285,7 +276,11 @@
 								{formatTime(message.timestamp)}
 							</span>
 						</b>
-						{message.message}
+						{#if message.message && message.message.includes('dd8kg243vt.ufs.sh')}
+							<img src={message.message} alt="Uploaded File" class="max-w-xs rounded-lg" />
+						{:else}
+							<p>{message.message}</p>
+						{/if}
 					</div>
 				</div>
 			{/each}
@@ -301,12 +296,25 @@
 					}}
 					class="chat-shadow relative flex w-full flex-col gap-2 rounded-t-xl border border-b-0 border-primary/70 px-3 py-3 text-secondary-foreground max-sm:pb-6"
 				>
+					<!-- Preview of image uploaded by the user -->
+					{#if imageFile}
+						<div class="group relative inline-block self-start">
+							<img class="max-h-12 w-auto rounded" src={imageFile.ufsUrl} alt="Uploaded File" />
+							<button
+								class="absolute -right-2 -top-2 flex h-6 w-6 items-center justify-center rounded-full bg-muted p-1 text-white opacity-0 transition-opacity group-hover:opacity-100"
+								onclick={() => (imageFile = null)}
+							>
+								<X />
+							</button>
+						</div>
+					{/if}
 					<textarea
 						bind:value={messageInput}
 						placeholder="Type your message here..."
 						class="w-full resize-none bg-transparent text-base leading-6 text-foreground outline-none placeholder:text-secondary-foreground/60"
 						aria-label="Message input"
 						autocomplete="off"
+						disabled={!!imageFile}
 						style="height: 48px !important;"
 						onkeydown={(e) => {
 							if (e.key === 'Enter' && !e.shiftKey) {
@@ -333,12 +341,48 @@
 								<span class="max-sm:hidden">Gesture AI</span>
 							</button>
 
-							<!-- Attach media button -->
+							<!-- Attach image button -->
 							<label
 								class="inline-flex h-auto cursor-pointer items-center gap-2 rounded-full border border-secondary-foreground/10 px-2 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted/40 hover:text-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 max-sm:p-2"
 								aria-label="Attach a file"
 							>
-								<input class="sr-only" type="file" />
+								<input
+									class="sr-only"
+									type="file"
+									onchange={async (e) => {
+										const file = e.currentTarget.files?.[0];
+										if (!file) return;
+
+										// Create promise for file upload
+										const uploadPromise = startUpload([file]);
+
+										// Set up the toast notifications
+										toast.promise(uploadPromise, {
+											loading: `Uploading ${file.name}...`,
+											success: (data) => {
+												// Add safety check for data
+												if (data && data.length > 0) {
+													const uploadedFile = data[0];
+													return `${uploadedFile.name} uploaded successfully!`;
+												}
+												// Fallback message if data is undefined or empty
+												return 'File uploaded successfully!';
+											},
+											error: 'Upload failed :( Try again!'
+										});
+
+										// Await the actual result
+										try {
+											const output = await uploadPromise;
+											if (output && output.length > 0) {
+												imageFile = output[0];
+												messageInput = imageFile.ufsUrl;
+											}
+										} catch (error) {
+											console.error('Upload error:', error);
+										}
+									}}
+								/>
 								<Paperclip class="size-4 shrink-0" />
 								<span class="max-sm:hidden">Attach</span>
 							</label>

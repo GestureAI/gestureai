@@ -22,6 +22,8 @@ services:
     container_name: frontend
     restart: unless-stopped
     build: ./frontend
+    environment:
+      UPLOADTHING_TOKEN: $UPLOADTHING_TOKEN
     ports:
       - "5000:3000"
 
@@ -29,7 +31,7 @@ services:
     image: redis:8-alpine
     container_name: redis
     restart: unless-stopped
-    command: redis-server --loglevel warning --requirepass $REDIS_PASS # Save every 60 seconds if at least 1 key changed. Save to /data
+    command: redis-server --loglevel warning  # Save every 60 seconds if at least 1 key changed. Save to /data
     ports:
       - "6379:6379"
 
