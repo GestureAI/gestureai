@@ -92,7 +92,7 @@
 					formData.append('file', blob, 'proxy-image.jpeg');
 
 					// Use local proxy endpoint instead of direct API call to bypass cors (temp)
-					const response = await fetch('/api/gesture', {
+					const response = await fetch('https://gestureai.chat/api/check', {
 						method: 'POST',
 						body: formData
 					});
