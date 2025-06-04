@@ -36,6 +36,14 @@
 	let isConnected = $state<boolean>(false);
 	let currentUser = $derived<User>({ username: $usernameStore });
 	let imageFile = $state<UploadedFile | null>(null);
+	let finalText = $state<string>('');
+
+	// Assign text from gestureAI predictiion to the message input
+	$effect(() => {
+		if (finalText) {
+			messageInput = finalText;
+		}
+	});
 
 	let currentWebSocket: WebSocket | null = null;
 	let connectionAttempts = 0;
@@ -215,7 +223,7 @@
 	});
 </script>
 
-<GestureAIDialog bind:gestureAIDialogOpen />
+<GestureAIDialog bind:gestureAIDialogOpen bind:finalText />
 
 <div class="flex flex-grow flex-col overflow-hidden">
 	<!-- Header with sidebar logic and breadcrumb component -->
@@ -269,11 +277,7 @@
 							</span>
 						</b>
 						{#if message.message && message.message.includes('dd8kg243vt.ufs.sh')}
-							<img
-								src={message.message}
-								alt="Uploaded File"
-								class="max-w-xs rounded-lg shadow-md"
-							/>
+							<img src={message.message} alt="Uploaded File" class="max-w-xs rounded-lg" />
 						{:else}
 							<p>{message.message}</p>
 						{/if}

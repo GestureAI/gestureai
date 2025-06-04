@@ -36,7 +36,7 @@
 				title: 'Private',
 				url: '/',
 				icon: MessageSquare,
-				isActive: true,
+				isActive: false,
 				items: [
 					{
 						title: 'Group Chat 1',
@@ -56,19 +56,19 @@
 					}
 				]
 			}
-		],
-		navSecondary: [
-			{
-				title: 'Support',
-				url: '#',
-				icon: LifeBuoy
-			},
-			{
-				title: 'Feedback',
-				url: '#',
-				icon: Send
-			}
 		]
+		// navSecondary: [
+		// 	{
+		// 		title: 'Support',
+		// 		url: '#',
+		// 		icon: LifeBuoy
+		// 	},
+		// 	{
+		// 		title: 'Feedback',
+		// 		url: '#',
+		// 		icon: Send
+		// 	}
+		// ]
 	});
 </script>
 
