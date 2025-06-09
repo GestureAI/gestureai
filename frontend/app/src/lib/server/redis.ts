@@ -1,4 +1,5 @@
 import { createClient, type RedisClientType } from 'redis';
+import { REDIS_URL } from '$env/static/private';
 
 // Define client type
 let client: RedisClientType;
@@ -7,7 +8,7 @@ let client: RedisClientType;
 const initializeClient = (): RedisClientType => {
 	if (!client) {
 		client = createClient({
-			url: import.meta.env.REDIS_URL || 'redis://redis:6379'
+			url: REDIS_URL || 'redis://redis:6379'
 		});
 
 		// Connection handling

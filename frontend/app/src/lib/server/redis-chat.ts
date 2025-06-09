@@ -1,4 +1,5 @@
 import { createClient, type RedisClientType } from 'redis';
+import { REDIS_URL } from '$env/static/private';
 
 // Defines the structure for chat messages.
 export interface ChatMessage {
@@ -28,7 +29,7 @@ export class RedisChatService {
 	public async initialize(): Promise<void> {
 		if (this.initialized) return;
 		this.client = createClient({
-			url: import.meta.env.REDIS_URL || 'redis://redis:6379'
+			url: REDIS_URL || 'redis://redis:6379'
 		});
 		this.client.on('error', (err) => console.error('Redis Client Error:', err));
 		await this.client.connect();
