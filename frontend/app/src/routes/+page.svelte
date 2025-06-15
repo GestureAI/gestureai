@@ -30,6 +30,7 @@
 
 	const autoScroll = new UseAutoScroll();
 
+	// Component state - reactive variables that trigger UI updates
 	let gestureAIDialogOpen = $state<boolean>(false);
 	let messages = $state<DisplayMessage[]>([]);
 	let messageInput = $state<string>('');
@@ -38,19 +39,21 @@
 	let imageFile = $state<UploadedFile | null>(null);
 	let finalText = $state<string>('');
 
-	// Assign text from gestureAI predictiion to the message input
+	// Reactive effect - updates message input when gesture AI provides text
 	$effect(() => {
 		if (finalText) {
 			messageInput = finalText;
 		}
 	});
 
+	// WebSocket connection management variables
 	let currentWebSocket: WebSocket | null = null;
 	let connectionAttempts = 0;
 	let reconnectTimerId: number | null = null;
 	// Flag to prevent auto-reconnect on intentional close
 	let isIntentionallyClosing = false;
 
+	// Utility function for displaying message timestamps
 	function formatTime(timestamp: number): string {
 		return new Date(timestamp).toLocaleTimeString([], {
 			day: '2-digit',
@@ -61,7 +64,8 @@
 		});
 	}
 
-	// Core WS connection and reconnection logic
+	// WebSocket connection establishment with retry logic
+	// Flow: connect() -> WebSocket creation -> event handlers setup -> username sending
 	function connect() {
 		// Prevent multiple concurrent connection attempts or connecting if already connected
 		if (
@@ -75,7 +79,7 @@
 		connectionAttempts++;
 		console.log(`[Client WS] connect: Attempting (attempt #${connectionAttempts})...`);
 
-		// Limit reconnection attempts
+		// Circuit breaker - prevents infinite reconnection attempts
 		if (connectionAttempts > 5) {
 			console.error('[Client WS] connect: Max connection attempts reached.');
 			return;
@@ -85,12 +89,14 @@
 		isIntentionallyClosing = false;
 
 		try {
+			// Protocol selection based on current page protocol (http/https)
 			const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
 			currentWebSocket = new WebSocket(`${protocol}//${window.location.host}/ws`);
 
+			// Connection success handler - sends username immediately after connection
 			currentWebSocket.onopen = () => {
 				console.log('[Client WS] onopen: Connection successful!');
-				// Send username immediately after connection
+				// Critical: Send username as first message to register with server
 				if (currentWebSocket && $usernameStore) {
 					currentWebSocket.send(
 						JSON.stringify({
@@ -100,7 +106,7 @@
 					);
 				}
 				isConnected = true;
-				// Reset attempts on successful connection
+				// Reset connection attempts on success
 				connectionAttempts = 0;
 				if (reconnectTimerId) {
 					clearTimeout(reconnectTimerId);
@@ -108,10 +114,13 @@
 				}
 			};
 
+			// Message handler - processes incoming messages from WebSocket server
+			// Flow: Server message -> onmessage -> parse -> update local state
 			currentWebSocket.onmessage = (event: MessageEvent) => {
 				const data = JSON.parse(event.data) as WebSocketIncomingData;
 				console.log('[Client WS] onmessage: Received:', data);
 
+				// Handle chat history - sent when first connecting
 				if (data.type === 'history') {
 					// Add history messages, filtering out any already present
 					const newHistoryMessages = data.messages.filter(
@@ -120,7 +129,7 @@
 					messages = [...messages, ...newHistoryMessages].sort((a, b) => a.timestamp - b.timestamp);
 				} else if (data.type === 'message') {
 					const serverMessage = data as ChatMessageFromServer;
-					// Attempt to find and replace a pending message sent by this client
+					// Optimistic UI update handling - replace pending message with server confirmation
 					const pendingMsgIndex = messages.findIndex(
 						(msg) =>
 							msg.id?.startsWith('client-') && // Check if it's a pending message
@@ -140,6 +149,7 @@
 				}
 			};
 
+			// Connection close handler - manages reconnection logic
 			currentWebSocket.onclose = (event: CloseEvent) => {
 				console.log(
 					`[Client WS] onclose: Closed. Code: ${event.code}, Intentional: ${isIntentionallyClosing}`
@@ -147,23 +157,25 @@
 				isConnected = false;
 				currentWebSocket = null;
 
+				// Skip reconnection if intentional close or max attempts reached
 				if (isIntentionallyClosing || connectionAttempts > 5) return;
 
-				// Implement exponential backoff for reconnection attempts
+				// Exponential backoff reconnection strategy
 				const timeout = Math.min(1000 * Math.pow(2, connectionAttempts), 30000);
 				console.log(`[Client WS] onclose: Reconnecting in ${timeout / 1000}s...`);
 				if (reconnectTimerId) clearTimeout(reconnectTimerId);
 				reconnectTimerId = setTimeout(connect, timeout) as unknown as number;
 			};
 
+			// Error handler - logs errors, onclose will handle reconnection
 			currentWebSocket.onerror = (errorEvent: Event) => {
 				console.error('[Client WS] onerror:', errorEvent);
 				// onclose should follow and handle reconnection
 			};
 		} catch (err) {
 			console.error('[Client WS] connect: Exception during WebSocket init:', err);
+			// Retry if WebSocket constructor failed
 			if (!isIntentionallyClosing && connectionAttempts <= 5) {
-				// Retry if WebSocket constructor failed
 				const timeout = Math.min(1000 * Math.pow(2, connectionAttempts), 30000);
 				if (reconnectTimerId) clearTimeout(reconnectTimerId);
 				reconnectTimerId = setTimeout(connect, timeout) as unknown as number;
@@ -171,7 +183,8 @@
 		}
 	}
 
-	// Add message sent by the user to the UI immediately
+	// Message sending with optimistic UI updates
+	// Flow: User input -> sendMessageInternal -> add to UI -> send to server -> server confirms
 	function sendMessageInternal(): void {
 		if (
 			!messageInput.trim() ||
@@ -184,8 +197,9 @@
 		imageFile = null;
 		const messageText = messageInput.trim();
 
+		// Optimistic UI update - show message immediately before server confirmation
 		const pendingMsg: PendingChatMessage = {
-			id: `client-${crypto.randomUUID()}`,
+			id: `client-${crypto.randomUUID()}`, // Temporary client-side ID
 			type: 'message',
 			username: $usernameStore,
 			message: messageText,
@@ -193,19 +207,22 @@
 		};
 		messages = [...messages, pendingMsg].sort((a, b) => a.timestamp - b.timestamp);
 
+		// Send to server - will be replaced by server confirmation in onmessage
 		currentWebSocket.send(messageText);
 		messageInput = '';
 	}
 
-	// Connect to WS on mount, disconnect on unmount
+	// Component lifecycle - establishes connection on mount, cleans up on unmount
+	// Flow: Component mount -> $effect -> connect() -> WebSocket lifecycle
 	$effect(() => {
 		console.log('[Client $effect] Mount: Initializing connection sequence.');
 		connectionAttempts = 0;
 		isIntentionallyClosing = false;
 
-		// Attempt initial connection
+		// Start initial connection attempt
 		connect();
 
+		// Cleanup function - called when component is destroyed
 		return () => {
 			console.log('[Client $effect] Unmount: Cleaning up WebSocket.');
 

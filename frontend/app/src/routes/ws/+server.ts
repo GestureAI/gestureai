@@ -1,25 +1,28 @@
 import type { Socket, Peer } from '@sveltejs/kit';
 import { RedisChatService, type ChatMessage } from '$lib/server/redis-chat';
 
-// Tracks active WebSocket peers
+// In-memory tracking of active WebSocket connections
+// Maps Peer objects to user information
 const activePeers = new Map<Peer, { username: string; peerId: string }>();
 
 export const socket: Socket = {
-	// Handles the initial HTTP request upgrade to WebSocket
+	// Step 1: HTTP to WebSocket upgrade - called before connection opens
 	upgrade(req) {
 		console.log(`[WS Server] HTTP upgrade request for: ${req.url}`);
 	},
 
-	// Called when a new WebSocket connection is established
+	// Step 2: New connection established - called after successful upgrade
+	// Flow: Client connects -> open() -> wait for username -> subscribe to chat
 	async open(peer) {
 		const peerId = peer.id;
 		console.log(`[WS Server] Peer ${peerId} connected, waiting for username...`);
 
-		// Initialize with empty username, will be set when client sends it
+		// Register peer with empty username - will be populated by 'set_username' message
 		activePeers.set(peer, { username: '', peerId });
 	},
 
-	// Called when a message is received from a client
+	// Step 3: Message handling - called for every message from clients
+	// Flow: Client sends -> message() -> parse -> save to Redis -> broadcast
 	async message(peer, messageData) {
 		const userInfo = activePeers.get(peer);
 		if (!userInfo) {
@@ -29,31 +32,32 @@ export const socket: Socket = {
 		const { username, peerId } = userInfo;
 
 		try {
-			// Try to parse as JSON first
+			// Message parsing - handles both JSON and plain text
 			let data;
 			try {
 				data = JSON.parse(String(messageData));
 			} catch {
-				// If not JSON, treat as plain text message
+				// Fallback for plain text messages from client
 				data = { message: String(messageData).trim() };
 			}
 
-			// Handle username setting
+			// Username registration flow - first message from client
 			if (data.type === 'set_username') {
 				const newUsername = data.username;
 				userInfo.username = newUsername;
 				activePeers.set(peer, userInfo);
 
+				// Initialize Redis service and save user
 				const chatService = RedisChatService.getInstance();
 				await chatService.initialize();
 				await chatService.saveUser(peerId, newUsername);
 				console.log(`[WS Server] User ${newUsername} (${peerId}) registered.`);
 
-				// Subscribe to chat
+				// Subscribe to chat channel for real-time messages
 				peer.subscribe('chat');
 				console.log(`[WS Server] Peer ${peerId} (${newUsername}) subscribed to 'chat'.`);
 
-				// Send message history
+				// Send chat history to new user
 				const recentMessages = await chatService.getRecentMessages(100);
 				const userMessagesHistory = recentMessages.filter((msg) => msg.type === 'message');
 				if (userMessagesHistory.length > 0) {
@@ -65,7 +69,7 @@ export const socket: Socket = {
 				return;
 			}
 
-			// Handle regular chat messages (only if username is set)
+			// Regular message handling - requires username to be set first
 			if (!username) {
 				peer.send(JSON.stringify({ type: 'error', message: 'Please set username first.' }));
 				return;
@@ -74,6 +78,7 @@ export const socket: Socket = {
 			const textMessage = data.message?.trim();
 			if (!textMessage) return;
 
+			// Message processing pipeline: create -> save to Redis -> broadcast
 			const chatService = RedisChatService.getInstance();
 			const chatMsgDto: ChatMessage = {
 				type: 'message',
@@ -82,6 +87,7 @@ export const socket: Socket = {
 				timestamp: Date.now()
 			};
 
+			// Save to Redis and broadcast to all subscribed clients
 			const savedMessage = await chatService.saveMessage(chatMsgDto);
 			peer.publish('chat', JSON.stringify(savedMessage));
 			console.log(`[WS Server] Msg from ${username} (ID: ${savedMessage.id}) saved & published.`);
@@ -95,7 +101,8 @@ export const socket: Socket = {
 		}
 	},
 
-	// Called when a client connection is closed
+	// Step 4: Connection cleanup - called when client disconnects
+	// Flow: Client disconnects -> close() -> cleanup Redis -> remove from activePeers
 	async close(peer, event) {
 		const userInfo = activePeers.get(peer);
 		const peerId = userInfo ? userInfo.peerId : peer.id;
@@ -103,6 +110,7 @@ export const socket: Socket = {
 			`[WS Server] Peer ${peerId} disconnected. Code: ${event?.code}, Reason: ${event?.reason}`
 		);
 
+		// Cleanup user data from Redis if they were registered
 		if (userInfo && userInfo.username) {
 			try {
 				await RedisChatService.getInstance().removeUser(peerId);
@@ -111,10 +119,12 @@ export const socket: Socket = {
 				console.error(`[WS Server] Error in close handler for ${peerId} (Redis cleanup):`, error);
 			}
 		}
+		// Remove from active tracking
 		activePeers.delete(peer);
 	},
 
-	// Called when a WebSocket error occurs for a specific peer
+	// Error handling - called when WebSocket errors occur
+	// Flow: Error occurs -> error() -> cleanup -> force close connection
 	error(peer, errorData) {
 		const userInfo = activePeers.get(peer);
 		const peerId = userInfo ? userInfo.peerId : peer.id;
@@ -125,6 +135,7 @@ export const socket: Socket = {
 				`[WS Server] Removing user ${userInfo.username} (${peerId}) from tracking due to error.`
 			);
 		}
+		// Force cleanup on error
 		activePeers.delete(peer);
 
 		try {
