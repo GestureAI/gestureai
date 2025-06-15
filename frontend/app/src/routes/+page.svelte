@@ -46,13 +46,6 @@
 		}
 	});
 
-	// WebSocket connection management variables
-	let currentWebSocket: WebSocket | null = null;
-	let connectionAttempts = 0;
-	let reconnectTimerId: number | null = null;
-	// Flag to prevent auto-reconnect on intentional close
-	let isIntentionallyClosing = false;
-
 	// Utility function for displaying message timestamps
 	function formatTime(timestamp: number): string {
 		return new Date(timestamp).toLocaleTimeString([], {
@@ -63,6 +56,13 @@
 			minute: '2-digit'
 		});
 	}
+
+	// WebSocket connection management variables
+	let currentWebSocket: WebSocket | null = null;
+	let connectionAttempts = 0;
+	let reconnectTimerId: number | null = null;
+	// Flag to prevent auto-reconnect on intentional close
+	let isIntentionallyClosing = false;
 
 	// WebSocket connection establishment with retry logic
 	// Flow: connect() -> WebSocket creation -> event handlers setup -> username sending
@@ -80,7 +80,7 @@
 		console.log(`[Client WS] connect: Attempting (attempt #${connectionAttempts})...`);
 
 		// Circuit breaker - prevents infinite reconnection attempts
-		if (connectionAttempts > 5) {
+		if (connectionAttempts > 20) {
 			console.error('[Client WS] connect: Max connection attempts reached.');
 			return;
 		}
@@ -158,7 +158,7 @@
 				currentWebSocket = null;
 
 				// Skip reconnection if intentional close or max attempts reached
-				if (isIntentionallyClosing || connectionAttempts > 5) return;
+				if (isIntentionallyClosing || connectionAttempts > 20) return;
 
 				// Exponential backoff reconnection strategy
 				const timeout = Math.min(1000 * Math.pow(2, connectionAttempts), 30000);
@@ -170,12 +170,11 @@
 			// Error handler - logs errors, onclose will handle reconnection
 			currentWebSocket.onerror = (errorEvent: Event) => {
 				console.error('[Client WS] onerror:', errorEvent);
-				// onclose should follow and handle reconnection
 			};
 		} catch (err) {
 			console.error('[Client WS] connect: Exception during WebSocket init:', err);
 			// Retry if WebSocket constructor failed
-			if (!isIntentionallyClosing && connectionAttempts <= 5) {
+			if (!isIntentionallyClosing && connectionAttempts <= 20) {
 				const timeout = Math.min(1000 * Math.pow(2, connectionAttempts), 30000);
 				if (reconnectTimerId) clearTimeout(reconnectTimerId);
 				reconnectTimerId = setTimeout(connect, timeout) as unknown as number;
@@ -194,6 +193,7 @@
 		) {
 			return;
 		}
+
 		imageFile = null;
 		const messageText = messageInput.trim();
 

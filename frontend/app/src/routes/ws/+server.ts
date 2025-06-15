@@ -102,7 +102,7 @@ export const socket: Socket = {
 	},
 
 	// Step 4: Connection cleanup - called when client disconnects
-	// Flow: Client disconnects -> close() -> cleanup Redis -> remove from activePeers
+	// Flow: Client disconnects -> close() -> remove from activePeers
 	async close(peer, event) {
 		const userInfo = activePeers.get(peer);
 		const peerId = userInfo ? userInfo.peerId : peer.id;
@@ -110,15 +110,6 @@ export const socket: Socket = {
 			`[WS Server] Peer ${peerId} disconnected. Code: ${event?.code}, Reason: ${event?.reason}`
 		);
 
-		// Cleanup user data from Redis if they were registered
-		if (userInfo && userInfo.username) {
-			try {
-				await RedisChatService.getInstance().removeUser(peerId);
-				console.log(`[WS Server] User ${userInfo.username} (${peerId}) removed from Redis.`);
-			} catch (error) {
-				console.error(`[WS Server] Error in close handler for ${peerId} (Redis cleanup):`, error);
-			}
-		}
 		// Remove from active tracking
 		activePeers.delete(peer);
 	},

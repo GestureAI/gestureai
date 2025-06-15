@@ -94,8 +94,7 @@ export class RedisChatService {
 		return client.get(`user:${peerId}`);
 	}
 
-	// Cleanup - removes user data when they disconnect
-	// Called in WebSocket close handler
+	// Cleanup
 	public async removeUser(peerId: string): Promise<void> {
 		const client = await this.getClient();
 		await client.del(`user:${peerId}`);
