@@ -25,9 +25,9 @@ While it works as a standard messaging app with text and image sharing, the main
 
 The app is split into a SvelteKit frontend and a Python backend, tied together with WebSockets and Redis.
 
-- **Frontend:** Svelte, SvelteKit, TypeScript, TailwindCSS, shadcn-svelte
-- **Backend:** Python (ASL model and API), WebSockets
-- **Infrastructure:** Docker, Redis, PostgreSQL, Nginx
+- **Frontend (Jesper):** Svelte, SvelteKit, TypeScript, WebSockets, TailwindCSS, shadcn-svelte,
+- **Backend (Viktor):** Python (ASL model, API, Analytics page)
+- **Infrastructure (Viktor & Jesper):** Docker, Redis, PostgreSQL, Nginx
 
 ## Setup
 
