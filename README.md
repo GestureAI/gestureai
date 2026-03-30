@@ -7,10 +7,10 @@ While it works as a standard messaging app with text and image sharing, the main
 ## Screenshots
 
 <div align="center">
-  <img src="docs/overview_light.png" width="90%" alt="Light Mode" />
-  <img src="docs/overview_dark.png" width="90%" alt="Dark Mode" />
+  <img src="docs/overview_light.png" alt="Light Mode" />
+  <img src="docs/overview_dark.png" alt="Dark Mode" />
   <br>
-  <img src="docs/asl.png" width="90%" alt="ASL Feature in Action" style="margin-top: 10px;" />
+  <img src="docs/asl.png" alt="ASL Feature in Action" />
 </div>
 
 ## Features
