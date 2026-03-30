@@ -14,7 +14,7 @@
 <ModeWatcher />
 
 {#if $usernameStore}
-	<div class="flex max-h-screen">
+	<div class="flex h-screen max-h-screen">
 		<Sidebar.Provider>
 			<AppSidebar />
 			<Sidebar.Inset>

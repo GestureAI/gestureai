@@ -26,15 +26,17 @@
 			</AlertDialog.Description>
 		</AlertDialog.Header>
 		<form onsubmit={handleSubmit}>
-			<Label for="username">Username</Label>
-			<Input
-				id="username"
-				placeholder="e.g., ChattyPatty14"
-				required
-				autofocus
-				maxlength={20}
-				bind:value={username}
-			/>
+			<div class="grid gap-2">
+				<Label for="username">Username</Label>
+				<Input
+					id="username"
+					placeholder="e.g., ChattyPatty14"
+					required
+					autofocus
+					maxlength={20}
+					bind:value={username}
+				/>
+			</div>
 
 			<AlertDialog.Footer class="pt-4">
 				<Button type="submit" disabled={!username.trim()}>Join Chat</Button>

@@ -1,51 +1,60 @@
 # GestureAI
 
-**GestureAI** is a real-time chat platform built for accessibility and innovation. It allows users to communicate via standard text and image sharing, but its core feature is an integrated AI model that interprets American Sign Language (ASL) gestures from a webcam feed and converts them into text input in real-time.
+GestureAI is a real-time chat application that translates American Sign Language (ASL) into text using your webcam. We built it as our final apprenticeship project ("Svenneprøve"). 
 
-This project was developed as our final apprenticeship project ("Svenneprøve").
+While it works as a standard messaging app with text and image sharing, the main draw is the ASL integration. If you toggle the camera on, a custom AI model reads your hand signs and types the corresponding characters directly into your chat input field.
 
-## Preview
+## Screenshots
 
-### Main page light mode  
-![Overview](docs/overview_light.png)
-
-### Main page dark mode  
-![Coin view](docs/overview_dark.png)
-
-### AI ASL feature  
-![Coin view](docs/asl.png)
+<div align="center">
+  <img src="docs/overview_light.png" width="90%" alt="Light Mode" />
+  <img src="docs/overview_dark.png" width="90%" alt="Dark Mode" />
+  <br>
+  <img src="docs/asl.png" width="90%" alt="ASL Feature in Action" style="margin-top: 10px;" />
+</div>
 
 ## Features
 
-*   **Real-time Messaging:** Instant chat functionality with other online users.
-*   **ASL Recognition:** Toggle your webcam to translate ASL hand signs into text characters using a custom Python AI model.
-*   **Media Sharing:** Upload and share images within the chat.
-*   **Modern UI:** Clean, responsive interface built with TailwindCSS and shadcn-svelte.
-*   **Containerized:** Fully dockerized for easy deployment.
+- **ASL Translation:** Turn on your webcam, and the custom AI model translates ASL signs into text characters.
+- **Real-time Chat:** Instant messaging powered by WebSockets.
+- **Media Uploads:** Share images directly in the chat.
+- **Dark/Light Mode:** Full theming support.
+- **Dockerized:** The entire stack (frontend, backend, Redis, Postgres) spins up with a single compose file.
 
 ## Tech Stack
 
-**Frontend & Backend Logic:**
-*   Svelte & SvelteKit
-*   TypeScript
-*   TailwindCSS
-*   shadcn-svelte
-*   WebSocket (Real-time communication)
+The app is split into a SvelteKit frontend and a Python backend, tied together with WebSockets and Redis.
 
-**AI & Analytics:**
-*   Python (ASL Recognition Model & Analytics)
+- **Frontend:** Svelte, SvelteKit, TypeScript, TailwindCSS, shadcn-svelte
+- **Backend:** Python (ASL model and API), WebSockets
+- **Infrastructure:** Docker, Redis, PostgreSQL, Nginx
 
-**Infrastructure:**
-*   Docker & Docker Compose
+## Setup
+
+You need Docker and Docker Compose installed. You'll also need to configure the environment variables before starting.
+
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/GestureAI/gestureai.git
+   cd gestureai
+   ```
+
+2. **Set up environment variables**
+   Create an `.env` file in the root directory. Based on the `docker-compose.yml`, you'll need to define variables like database credentials (`DB_USER`, `DB_PASS`, `DB_NAME`), your `UPLOADTHING_TOKEN`, and other backend secrets.
+
+3. **Run the containers**
+   ```bash
+   docker-compose up -d --build
+   ```
+
+4. **Access the app**
+   Open `http://localhost:5173/` in your browser. Nginx handles the routing automatically.
 
 ## Usage
 
-1.  **Sign In/Join:** Enter a username to join the global chat.
-2.  **Chat:** Type normally or upload images using the attachment icon.
-3.  **Gesture Mode:** Click the **Camera** icon to enable Gesture Mode.
-    *   Grant webcam permissions.
-    *   Perform ASL signs clearly in front of the camera.
-    *   The recognized characters will appear in your input field automatically.
+1. Enter a username to join the global chat room.
+2. Click the **Gesture AI** badge to enable Gesture Mode and grant webcam permissions.
+3. Perform ASL signs clearly in front of the camera, and the recognized characters will appear in your input field.
 
 ## License
 

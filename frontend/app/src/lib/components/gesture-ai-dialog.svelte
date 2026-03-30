@@ -7,8 +7,8 @@
 	let { gestureAIDialogOpen = $bindable<boolean>(false), finalText = $bindable<string>('') } =
 		$props();
 
-	let videoElement: HTMLVideoElement;
-	let canvasElement: HTMLCanvasElement;
+	let videoElement = $state<HTMLVideoElement>();
+	let canvasElement = $state<HTMLCanvasElement>();
 	let stream: MediaStream | null = $state(null);
 	let captureInterval: ReturnType<typeof setInterval> | null = $state(null);
 	let gestureText = $state('');
@@ -133,27 +133,31 @@
 		</Dialog.Header>
 
 		<!-- Webcam Preview -->
-		<div class="mb-4 flex justify-center">
+		<div class="flex justify-center">
 			<video
 				bind:this={videoElement}
 				autoplay
 				muted
 				playsinline
-				class="w-full rounded-lg border bg-muted object-cover"
+				class="aspect-video w-full rounded-lg border bg-muted object-cover"
 			></video>
 		</div>
 
 		<!-- Hidden canvas for frame capture -->
 		<canvas bind:this={canvasElement} style="display: none;"></canvas>
 
-		<p class="mx-auto text-2xl font-medium uppercase">{charGuess}</p>
+		<div class="bg-muted rounded-lg p-4 text-center">
+			<p class="text-2xl font-medium uppercase">{charGuess}</p>
+		</div>
 
-		<Label for="gestureText">Gesture Text</Label>
-		<Textarea
-			id="gestureText"
-			bind:value={gestureText}
-			placeholder="Your sign language text will be inputted here"
-		/>
+		<div class="grid gap-2">
+			<Label for="gestureText">Gesture Text</Label>
+			<Textarea
+				id="gestureText"
+				bind:value={gestureText}
+				placeholder="Your sign language text will be inputted here"
+			/>
+		</div>
 
 		<Dialog.Footer>
 			<Button type="submit" onclick={save}>Save</Button>

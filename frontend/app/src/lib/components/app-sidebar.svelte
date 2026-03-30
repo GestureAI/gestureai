@@ -19,15 +19,11 @@
 						url: '/'
 					},
 					{
-						title: 'Temporary Chat',
+						title: "user123's Chat",
 						url: '/'
 					},
 					{
-						title: "User525's Chat",
-						url: '/'
-					},
-					{
-						title: "User526's Chat",
+						title: "bob's Chat",
 						url: '/'
 					}
 				]
@@ -102,7 +98,7 @@
 								<Command class="size-4" />
 							</div>
 							<div class="grid flex-1 text-left text-sm leading-tight">
-								<span class="truncate text-2xl font-semibold">GestureAI</span>
+								<span class="truncate text-base font-semibold">GestureAI</span>
 							</div>
 						</a>
 					{/snippet}

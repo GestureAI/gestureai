@@ -22,6 +22,7 @@
 	import { usernameStore } from '$lib/stores';
 	import { UseAutoScroll } from '$lib/hooks/use-auto-scroll.svelte';
 	import { Paperclip, ArrowUp, Hand, X } from '@lucide/svelte';
+	import * as Avatar from '$lib/components/ui/avatar/index.js';
 	import GestureAIDialog from '$lib/components/gesture-ai-dialog.svelte';
 	import { createUploadThing } from '$lib/utils/uploadthing';
 	import { toast } from 'svelte-sonner';
@@ -244,15 +245,13 @@
 
 <div class="flex flex-grow flex-col overflow-hidden">
 	<!-- Header with sidebar logic and breadcrumb component -->
-	<header class="flex h-16 shrink-0 items-center justify-between gap-2">
+	<header class="border-border flex h-16 shrink-0 items-center justify-between gap-2 border-b">
 		<div class="flex items-center gap-2 px-4">
 			<Sidebar.Trigger class="-ml-1" />
 			<Separator orientation="vertical" class="mr-2 h-4" />
 
 			<Breadcrumb class="hidden sm:block">
-				<BreadcrumbList
-					class="rounded-lg border border-border bg-background px-3 py-2 shadow-sm shadow-black/5"
-				>
+				<BreadcrumbList>
 					<BreadcrumbItem>
 						<BreadcrumbLink href="/">GestureAI</BreadcrumbLink>
 					</BreadcrumbItem>
@@ -266,15 +265,12 @@
 
 		<!-- Show if user is connected to websocket -->
 		<div class="mr-4">
-			<Badge
-				variant="outline"
-				class="gap-1.5 rounded-lg border border-border bg-background px-3 py-2 shadow-sm shadow-black/5"
-			>
+			<Badge variant="outline" class="gap-1.5 rounded-md px-2.5 py-1.5 text-xs font-medium">
 				<span
-					class="size-2 rounded-full {isConnected ? 'bg-emerald-500' : 'bg-red-500'}"
+					class="size-1.5 rounded-full {isConnected ? 'bg-success' : 'bg-destructive'}"
 					aria-hidden="true"
 				></span>
-				{isConnected ? 'Connected' : 'Disconnected'}
+				<span class="text-muted-foreground">{isConnected ? 'Connected' : 'Disconnected'}</span>
 			</Badge>
 		</div>
 	</header>
@@ -282,43 +278,76 @@
 	<div class="flex flex-1 flex-col overflow-hidden px-2 sm:px-0">
 		<!-- Chat area -->
 		<div
-			class="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-y-4 overflow-y-auto rounded"
+			class="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-y-1 overflow-y-auto rounded p-4"
 			bind:this={autoScroll.ref}
 		>
-			{#each messages as message (message.id)}
-				<div class="flex w-full {message.username === $usernameStore ? 'justify-end' : ''}">
-					<div class="flex flex-col">
-						<b>
-							{message.username}<span class="ml-2 text-xs text-muted-foreground">
-								{formatTime(message.timestamp)}
-							</span>
-						</b>
-						{#if message.message && message.message.includes('dd8kg243vt.ufs.sh')}
-							<img src={message.message} alt="Uploaded File" class="max-w-xs rounded-lg" />
+			{#each messages as message, i (message.id)}
+				{@const isOwn = message.username === $usernameStore}
+				{@const showHeader = i === 0 || messages[i - 1].username !== message.username}
+				{#if showHeader && i !== 0}
+					<div class="mt-2"></div>
+				{/if}
+				<div class="flex {isOwn ? 'justify-end' : 'justify-start'}">
+					<div class="flex max-w-[75%] gap-2 {isOwn ? 'flex-row-reverse' : 'flex-row'}">
+						<!-- Avatar (only on first message of a group) -->
+						{#if showHeader}
+							<Avatar.Root class="mt-1 h-8 w-8 shrink-0">
+								<Avatar.Fallback>{message.username[0]}</Avatar.Fallback>
+							</Avatar.Root>
 						{:else}
-							<p>{message.message}</p>
+							<div class="w-8 shrink-0"></div>
 						{/if}
+
+						<div class="flex flex-col {isOwn ? 'items-end' : 'items-start'}">
+							{#if showHeader}
+								<div class="flex items-baseline gap-2 px-1 pb-1">
+									<span class="text-sm font-semibold">{message.username}</span>
+									<span class="text-muted-foreground text-xs"
+										>{formatTime(message.timestamp)}</span
+									>
+								</div>
+							{/if}
+
+							<!-- Message bubble -->
+							<div
+								class="rounded-2xl px-3 py-2 {isOwn
+									? 'bg-primary/18 text-foreground rounded-tr-sm'
+									: 'bg-muted rounded-tl-sm'}"
+							>
+								{#if message.message && message.message.includes('dd8kg243vt.ufs.sh')}
+									<img
+										src={message.message}
+										alt="Uploaded"
+										class="max-h-64 max-w-full rounded-lg"
+									/>
+								{:else}
+									<p class="whitespace-pre-wrap text-sm leading-relaxed">
+										{message.message}
+									</p>
+								{/if}
+							</div>
+						</div>
 					</div>
 				</div>
 			{/each}
 		</div>
 
 		<!-- Input area -->
-		<div class="mx-auto mt-4 flex w-full max-w-3xl shrink-0 items-center">
-			<div class="w-full rounded-t backdrop-blur-lg">
+		<div class="mx-auto flex w-full max-w-3xl shrink-0 items-center pb-4">
+			<div class="w-full rounded-xl">
 				<form
 					onsubmit={(event) => {
 						event.preventDefault();
 						sendMessageInternal();
 					}}
-					class="chat-shadow relative flex w-full flex-col gap-2 rounded-t-xl border border-b-0 border-primary/70 px-3 py-3 text-secondary-foreground max-sm:pb-6"
+					class="bg-card border-border relative flex w-full flex-col gap-2 rounded-xl border px-3 py-3 shadow-sm"
 				>
 					<!-- Preview of image uploaded by the user -->
 					{#if imageFile}
 						<div class="group relative inline-block self-start">
 							<img class="max-h-12 w-auto rounded" src={imageFile.ufsUrl} alt="Uploaded File" />
 							<button
-								class="absolute -right-2 -top-2 flex h-6 w-6 items-center justify-center rounded-full bg-muted p-1 text-white opacity-0 transition-opacity group-hover:opacity-100"
+								class="bg-muted text-primary-foreground absolute -top-2 -right-2 flex h-6 w-6 items-center justify-center rounded-full p-1 opacity-0 transition-opacity group-hover:opacity-100"
 								onclick={() => (imageFile = null)}
 							>
 								<X />
@@ -328,7 +357,7 @@
 					<textarea
 						bind:value={messageInput}
 						placeholder="Type your message here..."
-						class="w-full resize-none bg-transparent text-base leading-6 text-foreground outline-none placeholder:text-secondary-foreground/60"
+						class="text-foreground placeholder:text-muted-foreground w-full resize-none bg-transparent text-sm leading-6 outline-none"
 						aria-label="Message input"
 						autocomplete="off"
 						disabled={!!imageFile}
@@ -347,9 +376,9 @@
 					<!-- Action buttons -->
 					<div class="flex items-center justify-between">
 						<div class="flex items-center gap-x-2">
-							<!-- Open modal for  AI sign language recognition -->
+							<!-- Open modal for AI sign language recognition -->
 							<button
-								class="inline-flex h-auto items-center gap-2 rounded-full border border-secondary-foreground/10 px-2 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted/40 hover:text-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 max-sm:p-2"
+								class="text-muted-foreground hover:bg-accent hover:text-accent-foreground inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-xs font-medium transition-colors max-sm:p-2"
 								onclick={() => {
 									gestureAIDialogOpen = true;
 								}}
@@ -360,7 +389,7 @@
 
 							<!-- Attach image button -->
 							<label
-								class="inline-flex h-auto cursor-pointer items-center gap-2 rounded-full border border-secondary-foreground/10 px-2 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted/40 hover:text-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 max-sm:p-2"
+								class="text-muted-foreground hover:bg-accent hover:text-accent-foreground inline-flex cursor-pointer items-center gap-2 rounded-full px-3 py-1.5 text-xs font-medium transition-colors max-sm:p-2"
 								aria-label="Attach a file"
 							>
 								<input
@@ -421,15 +450,3 @@
 		</div>
 	</div>
 </div>
-
-<style>
-	.chat-shadow {
-		box-shadow:
-			rgba(0, 0, 0, 0.1) 0px 80px 50px 0px,
-			rgba(0, 0, 0, 0.07) 0px 50px 30px 0px,
-			rgba(0, 0, 0, 0.06) 0px 30px 15px 0px,
-			rgba(0, 0, 0, 0.04) 0px 15px 8px,
-			rgba(0, 0, 0, 0.04) 0px 6px 4px,
-			rgba(0, 0, 0, 0.02) 0px 2px 2px;
-	}
-</style>
